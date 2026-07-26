@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
         const svcData = await rq(`query($id: String!) { project(id: $id) { services { edges { node { id } } } } }`, railwayToken, { id: projId });
         const svcs = svcData.data.project?.services?.edges || [];
         const svcId = svcs[0]?.node?.id;
-        if (!svcId) throw new Error('سرویس هنوز ساخته نشده. لطفاً 30 ثانیه صبر کنید و دوباره تلاش کنید.');
+        if (!svcId) throw new Error('سرویس هنوز ساخته نشده. لطفاً 30 ثانیه صبر کنید.');
         step(`سرویس: ${svcId}`);
 
         // Set env vars
@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
         step('ری‌استارت...');
         await rq(`mutation($eid: String!, $sid: String!) { serviceInstanceDeploy(environmentId: $eid, serviceId: $sid) { id } }`, railwayToken, { eid: envId, sid: svcId }).catch(() => {});
 
-        // Create domain on port 3000
+        // Create ONLY ONE domain on port 3000 (panel)
         step('ساخت دامنه پنل (3000)...');
         let panelDomain;
         try {
@@ -114,20 +114,20 @@ module.exports = async (req, res) => {
         const panelUrl = `https://${panelDomain}/managepanel/`;
         step(`پنل: ${panelUrl}`);
 
-        // Create TCP proxy on port 8080
-        step('ساخت TCP Proxy (8080)...');
-        let tcpDomain = null;
-        try {
-            const tRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-                i: { serviceId: svcId, environmentId: envId, targetPort: 8080 }
-            });
-            tcpDomain = tRes.data.serviceDomainCreate.domain;
-        } catch (e) { tcpDomain = null; }
-        step(`TCP: ${tcpDomain || 'در حال راه‌اندازی'}`);
+        // TCP Proxy on port 8080 — user must create manually in Railway dashboard
+        step('TCP Proxy: ساخت دستی از Railway Dashboard');
+        const tcpDashboardUrl = `https://railway.com/project/${projId}/${svcId}`;
 
         return res.status(200).json({
-            status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
-            panelUrl, tcpProxy: tcpDomain ? `${tcpDomain}:8080` : null, tcpDomain, log
+            status: 'ok',
+            projectId: projId,
+            serviceId: svcId,
+            environmentId: envId,
+            panelUrl,
+            tcpProxy: null,
+            tcpDomain: null,
+            tcpDashboardUrl,
+            log
         });
 
     } catch (err) {
