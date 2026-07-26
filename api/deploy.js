@@ -102,7 +102,8 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
       panelUrl, region: selectedRegion,
-      regionName: REGIONS[selectedRegion].name, log
+      regionName: REGIONS[selectedRegion].name,
+      flag: REGIONS[selectedRegion].flag, log
     });
 
   } catch (err) {

@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
         if (action === 'verify_github') {
             if (!githubToken) return res.status(400).json({ error: 'Token required' });
             const user = await ghFetch('/user', githubToken);
-            return res.json({ status: 'ok', username: user.login });
+            return res.json({ status: 'ok', user: user.login });
         }
 
         if (action === 'fork_and_connect') {
