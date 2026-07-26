@@ -73,22 +73,36 @@ body{font-family:'Vazirmatn',sans-serif}
 </button>
 </div>
 
-<!-- ===== STEP 3: Install GitHub App ===== -->
-<div id="s3" class="glass rounded-2xl p-5 mb-4 step-box">
+<!-- Region Selector -->
+<div id="regionBox" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
-<div id="s3n" class="sn">۳</div>
-<div><h2 class="font-bold">اتصال GitHub به Railway</h2><p class="text-slate-400 text-xs">GitHub App رو نصب کنید</p></div>
+<div id="regionNum" class="sn">۳</div>
+<div><h2 class="font-bold">انتخاب سرور</h2><p class="text-slate-400 text-xs">منطقه سرور فیلترشکن</p></div>
 </div>
-<p class="text-xs text-slate-400 mb-3">برای اتصال ریپوی فورک شده به Railway، باید GitHub App رو نصب کنید:</p>
-<a id="ghAppLink" href="#" target="_blank" class="flex items-center gap-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl p-3 mb-3 hover:bg-indigo-600/30 transition-all">
-<i class="fab fa-github text-indigo-400 text-lg"></i>
-<div>
-<p class="text-sm font-bold text-indigo-400">نصب GitHub App</p>
-<p class="text-[10px] text-slate-500">روی این لینک کلیک کنید و Install بزنید</p>
+<div class="grid grid-cols-2 gap-2">
+<button onclick="pickRegion('us-west1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
+<i class="fas fa-flag-usa text-blue-400 text-lg mb-1"></i>
+<p class="text-xs font-bold">کالیفرنیا</p>
+<p class="text-[10px] text-slate-500">us-west1</p>
+</button>
+<button onclick="pickRegion('us-east4',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
+<i class="fas fa-landmark text-purple-400 text-lg mb-1"></i>
+<p class="text-xs font-bold">ویرجینیا</p>
+<p class="text-[10px] text-slate-500">us-east4</p>
+</button>
+<button onclick="pickRegion('europe-west1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
+<i class="fas fa-wind text-cyan-400 text-lg mb-1"></i>
+<p class="text-xs font-bold">آمستردام</p>
+<p class="text-[10px] text-slate-500">europe-west1</p>
+</button>
+<button onclick="pickRegion('asia-southeast1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
+<i class="fas fa-palm-tree text-green-400 text-lg mb-1"></i>
+<p class="text-xs font-bold">سنگاپور</p>
+<p class="text-[10px] text-slate-500">asia-southeast1</p>
+</button>
 </div>
-</a>
-<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all">
-<i class="fas fa-rocket ml-1"></i>نصب کردم، دیپلوی کن
+<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm mt-3 transition-all" disabled>
+<i class="fas fa-rocket ml-1"></i>انتخاب و دیپلوی
 </button>
 </div>
 
@@ -124,9 +138,21 @@ body{font-family:'Vazirmatn',sans-serif}
 <div class="bg-slate-800/50 rounded-xl p-3">
 <div class="flex justify-between items-center mb-2">
 <span class="text-slate-400 text-xs">🌐 TCP Proxy :8080</span>
-<button onclick="cp('tUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="text-white font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
+<p class="text-[11px] text-slate-400 mb-2">برای ساخت TCP Proxy از Railway Dashboard استفاده کنید:</p>
+<a id="tcpDashLink" href="#" target="_blank" class="block w-full py-2 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-xs font-bold text-indigo-400 text-center mb-2 hover:bg-indigo-600/30">
+<i class="fas fa-external-link-alt ml-1"></i>رفتن به Railway Dashboard
+</a>
+<p class="text-[10px] text-slate-500 mb-2">در بخش Networking → <span class="text-white">+ TCP Proxy</span> → پورت <span class="text-white">8080</span></p>
+<!-- After creating, enter domain for testing -->
+<div id="tcpInputBox" class="hidden">
+<div class="flex gap-2 mb-2">
+<input id="tcpManualDomain" type="text" class="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono focus:border-cyan-500 focus:outline-none" placeholder="دامنه TCP Proxy رو وارد کنید">
+<button onclick="setTcpDomain()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-xs font-bold">ثبت</button>
+</div>
+</div>
+<div id="tcpActiveBox" class="hidden">
+<p class="text-white font-mono text-sm mb-2" id="tUrl">-</p>
 <div class="flex gap-2">
 <button onclick="testTcp()" id="tBtn" class="flex-1 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید
@@ -136,6 +162,10 @@ body{font-family:'Vazirmatn',sans-serif}
 </button>
 </div>
 <p id="tStatus" class="text-[10px] text-center mt-1.5"></p>
+</div>
+<button onclick="showTcpInput()" class="w-full py-1.5 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-[11px] text-slate-400 mt-2 transition-all">
+<i class="fas fa-plus ml-1"></i>TCP Proxy ساختم، دامنه رو ثبت کنم
+</button>
 </div>
 <!-- Open Panel -->
 <button onclick="window.open(document.getElementById('pUrl').textContent)" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm">
@@ -189,6 +219,7 @@ b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و ف�
 }
 
 /* ===== STEP 2: Railway Token ===== */
+let selectedRegion=null;
 async function step2(){
 const t=document.getElementById('rgToken').value.trim();
 if(!t)return;
@@ -201,27 +232,23 @@ if(v.status==='error')throw new Error(v.error);
 S.rg=t;
 m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.email+' — متصل ✓</span>';
 document.getElementById('s2n').classList.add('done');document.getElementById('s2n').innerHTML='<i class="fas fa-check"></i>';
-document.getElementById('s3').classList.add('active');
-// Check if GitHub App is already installed
-const ch=await api('/api/connect',{action:'check_github_app',railwayToken:t});
-if(ch.installed){
-// Skip step 3, go directly to deploy
-document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
-document.getElementById('s3').querySelector('p').textContent='GitHub App نصب است ✓';
-document.getElementById('ghAppLink').style.display='none';
-document.getElementById('b3').style.display='none';
-document.getElementById('s4').classList.add('active');
-await doDeploy();
-}else{
-document.getElementById('ghAppLink').href=ch.installUrl||'#';
-}
+// Show region selector
+document.getElementById('regionBox').classList.add('active');
 }catch(e){m.innerHTML='<i class="fas fa-times-circle text-red-400"></i> <span class="text-red-400">'+e.message+'</span>';}
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== STEP 3: Confirm GitHub App installed ===== */
+/* ===== Region Picker ===== */
+function pickRegion(r,el){
+selectedRegion=r;
+document.querySelectorAll('.region-btn').forEach(b=>{b.classList.remove('border-cyan-500');b.classList.add('border-slate-700');});
+el.classList.remove('border-slate-700');el.classList.add('border-cyan-500');
+document.getElementById('b3').disabled=false;
+}
+
+/* ===== STEP 3: Deploy ===== */
 async function step3(){
-document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
+document.getElementById('regionNum').classList.add('done');document.getElementById('regionNum').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s4').classList.add('active');
 await doDeploy();
 }
@@ -235,7 +262,7 @@ const steps=[
 ];
 for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600);}
 try{
-const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg});
+const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:selectedRegion||'us-west1'});
 if(r.status==='error')throw new Error(r.error);
 if(r.status==='need_github_app'){
 document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';
@@ -245,8 +272,8 @@ return;
 if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
 document.getElementById('pUrl').textContent=r.panelUrl;
-S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
-document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
+// TCP Proxy section
+document.getElementById('tcpDashLink').href=r.tcpDashboardUrl||'#';
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
@@ -255,6 +282,22 @@ document.getElementById('s4n').classList.add('done');document.getElementById('s4
 document.getElementById('logbox').innerHTML='<p class="text-red-400">❌ '+e.message+'</p>';
 document.getElementById('ptxt').textContent='خطا';
 }
+}
+
+/* ===== TCP Show Input ===== */
+function showTcpInput(){
+document.getElementById('tcpInputBox').classList.remove('hidden');
+document.getElementById('tcpManualDomain').focus();
+}
+
+/* ===== TCP Set Domain ===== */
+function setTcpDomain(){
+const d=document.getElementById('tcpManualDomain').value.trim();
+if(!d)return;
+S.tcpDomain=d;
+document.getElementById('tUrl').textContent=d+':8080';
+document.getElementById('tcpInputBox').classList.add('hidden');
+document.getElementById('tcpActiveBox').classList.remove('hidden');
 }
 
 /* ===== TCP Test ===== */
@@ -277,20 +320,13 @@ document.getElementById('tBtn').innerHTML='<i class="fas fa-signal ml-1"></i>ب�
 
 /* ===== TCP Change ===== */
 async function changeTcp(){
-if(!confirm('دامنه فعلی حذف و جدید ساخته میشه. ادامه؟'))return;
-document.getElementById('nBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
+// Go back to input box
+document.getElementById('tcpActiveBox').classList.add('hidden');
+document.getElementById('tcpInputBox').classList.remove('hidden');
+document.getElementById('tcpManualDomain').value='';
+document.getElementById('tcpManualDomain').focus();
+document.getElementById('tStatus').textContent='دامنه قبلی رو از Railway Dashboard حذف کنید و جدید بسازید';
 document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
-document.getElementById('tStatus').textContent='حذف و ساخت دامنه جدید...';
-try{
-const r=await api('/api/tcp',{action:'change',domainId:S.tcpDomainId,serviceId:S.svcId,environmentId:S.envId,railwayToken:S.rg});
-if(r.status==='ok'&&r.domain){
-S.tcpDomain=r.domain;S.tcpDomainId=r.domainId;
-document.getElementById('tUrl').textContent=r.domain+':8080';
-document.getElementById('tStatus').textContent='⚠️ دامنه جدید ساخته شد — تست کنید';
-document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
-}else throw new Error(r.error||'ناشناخته');
-}catch(e){document.getElementById('tStatus').textContent='❌ '+e.message;}
-document.getElementById('nBtn').innerHTML='<i class="fas fa-sync ml-1"></i>تغییر دامنه';
 }
 
 /* ===== Helpers ===== */

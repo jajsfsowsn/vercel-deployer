@@ -11,8 +11,17 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-    const { githubToken, railwayToken } = req.body || {};
+    const { githubToken, railwayToken, region } = req.body || {};
     if (!githubToken || !railwayToken) return res.status(400).json({ error: 'Both tokens required' });
+
+    // Railway regions
+    const REGIONS = {
+        'us-west1': 'California',
+        'us-east4': 'Virginia',
+        'europe-west1': 'Amsterdam',
+        'asia-southeast1': 'Singapore'
+    };
+    const selectedRegion = REGIONS[region] ? region : 'us-west1';
 
     const log = [];
     const step = (msg) => log.push(msg);
@@ -71,6 +80,12 @@ module.exports = async (req, res) => {
         if (!svcId) throw new Error('سرویس هنوز ساخته نشده.');
         step(`سرویس: ${svcId}`);
 
+        // Set region
+        step(`تنظیم منطقه: ${REGIONS[selectedRegion]}...`);
+        await rq(`mutation($sid: String!, $eid: String!, $i: ServiceInstanceUpdateInput!) { serviceInstanceUpdate(serviceId: $sid, environmentId: $eid, input: $i) { id } }`, railwayToken, {
+            sid: svcId, eid: envId, i: { region: selectedRegion }
+        }).catch(() => {});
+
         // Set env vars
         step('تنظیم NGINX_PORT=3000...');
         await rq(`mutation($i: VariableCollectionUpsertInput!) { variableCollectionUpsert(input: $i) }`, railwayToken, {
@@ -83,27 +98,23 @@ module.exports = async (req, res) => {
         step('ری‌استارت...');
         await rq(`mutation($eid: String!, $sid: String!) { serviceInstanceDeploy(environmentId: $eid, serviceId: $sid) { id } }`, railwayToken, { eid: envId, sid: svcId }).catch(() => {});
 
-        // Domain on port 3000 (panel)
+        // ONLY ONE domain on port 3000 (panel)
         step('ساخت دامنه پنل (3000)...');
-        const dRes3000 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
+        const dRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
             i: { serviceId: svcId, environmentId: envId, targetPort: 3000 }
         });
-        const panelDomain = dRes3000.data.serviceDomainCreate.domain;
+        const panelDomain = dRes.data.serviceDomainCreate.domain;
         const panelUrl = `https://${panelDomain}/managepanel/`;
         step(`پنل: ${panelUrl}`);
 
-        // TCP Proxy domain on port 8080
-        step('ساخت TCP Proxy (8080)...');
-        const dRes8080 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-            i: { serviceId: svcId, environmentId: envId, targetPort: 8080 }
-        });
-        const tcpDomain = dRes8080.data.serviceDomainCreate.domain;
-        const tcpDomainId = dRes8080.data.serviceDomainCreate.id;
-        step(`TCP Proxy: ${tcpDomain}:8080`);
+        // TCP Proxy info (manual creation needed)
+        step('TCP Proxy: نیاز به ساخت دستی از Railway Dashboard');
 
         return res.status(200).json({
             status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
-            panelUrl, tcpDomain, tcpDomainId, log
+            panelUrl, region: REGIONS[selectedRegion],
+            tcpDashboardUrl: `https://railway.com/project/${projId}/${svcId}`,
+            log
         });
 
     } catch (err) {
