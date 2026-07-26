@@ -87,12 +87,32 @@ module.exports = async (req, res) => {
 
         // ---- Step 5: Deploy from GitHub repo ----
         step('اتصال ریپو به Railway...');
+        
+        // Check if GitHub repos are accessible (GitHub App installed?)
+        let githubAccessible = false;
+        try {
+            const reposCheck = await railwayQuery(`query { githubRepos { id } }`, railwayToken);
+            githubAccessible = reposCheck.data?.githubRepos?.length > 0;
+        } catch (e) {
+            githubAccessible = false;
+        }
+
+        if (!githubAccessible) {
+            // GitHub App not installed - provide installation link
+            const installUrl = `https://github.com/apps/railway-app/installations/new?state=${encodeURIComponent(JSON.stringify({projectId}))}`;
+            return res.status(200).json({
+                status: 'need_github_app',
+                error: 'GitHub App Railway نصب نیست. روی لینک زیر کلیک کنید:',
+                installUrl,
+                projectId,
+                log
+            });
+        }
+
+        // githubRepoDeploy returns String! (not an object)
         const deployResult = await railwayQuery(`
             mutation($input: GitHubRepoDeployInput!) {
-                githubRepoDeploy(input: $input) {
-                    id
-                    serviceId
-                }
+                githubRepoDeploy(input: $input)
             }
         `, railwayToken, {
             input: {
@@ -103,7 +123,33 @@ module.exports = async (req, res) => {
             }
         });
 
-        const serviceId = deployResult.data.githubRepoDeploy.serviceId;
+        // Result is a string (deployment ID)
+        const deployId = deployResult.data.githubRepoDeploy;
+        step(`دیپلوی شروع شد: ${deployId}`);
+
+        // Wait for deployment to register
+        await sleep(5000);
+
+        // Get the service ID from the project
+        const projectData = await railwayQuery(`
+            query($id: String!) {
+                project(id: $id) {
+                    services {
+                        edges {
+                            node {
+                                id
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        `, railwayToken, { id: projectId });
+
+        const services = projectData.data.project?.services?.edges || [];
+        const serviceId = services[0]?.node?.id;
+        if (!serviceId) throw new Error('سرویس پیدا نشد. لطفاً چند لحظه صبر کنید و دوباره تلاش کنید.');
+        
         step('ریپو متصل شد و دیپلوی در حال انجام...');
 
         // ---- Step 6: Set environment variables ----

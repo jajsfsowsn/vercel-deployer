@@ -385,6 +385,18 @@ async function startDeploy() {
 
         if (r.status === 'error') throw new Error(r.error);
 
+        // Check if GitHub App needs to be installed
+        if (r.status === 'need_github_app') {
+            document.getElementById('logBox').innerHTML =
+                '<p class="text-amber-400">⚠️ ' + r.error + '</p>' +
+                '<p class="mt-2"><a href="' + r.installUrl + '" target="_blank" class="text-cyan-400 underline font-bold">👉 کلیک کن برای نصب GitHub App</a></p>' +
+                '<p class="text-slate-500 mt-2 text-xs">بعد از نصب، دوباره دیپلوی رو شروع کن</p>';
+            document.getElementById('progressText').textContent = 'نیاز به نصب GitHub App';
+            // Store projectId for retry
+            state.projectId = r.projectId;
+            return;
+        }
+
         if (r.log) {
             document.getElementById('logBox').innerHTML = r.log.map(l => '<p class="text-green-400">✓ ' + l + '</p>').join('');
         }
