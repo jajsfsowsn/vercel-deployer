@@ -53,12 +53,12 @@ module.exports = async (req, res) => {
         const me = await railwayQuery(`query { me { id name email } }`, railwayToken);
         const userId = me.data.me.id;
 
-        // Get or create team
-        const teamData = await railwayQuery(`query { me { workspaces { edges { node { id name } } } } }`, railwayToken);
-        const workspaces = teamData.data.me.workspaces?.edges || [];
+        // Get workspace
+        const teamData = await railwayQuery(`query { me { workspaces { id name } } }`, railwayToken);
+        const workspaces = teamData.data.me.workspaces || [];
         let workspaceId = null;
         if (workspaces.length > 0) {
-            workspaceId = workspaces[0].node.id;
+            workspaceId = workspaces[0].id;
         }
 
         // ---- Step 4: Create Railway project ----
