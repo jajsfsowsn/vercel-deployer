@@ -14,17 +14,19 @@ module.exports = async (req, res) => {
   try {
     if (action === 'test') {
       if (!host) return res.status(400).json({ error: 'host required' });
+      // Strip port from host - test domain only
+      const cleanHost = host.split(':')[0];
       try {
         const ctrl = new AbortController();
         const tid = setTimeout(() => ctrl.abort(), 5000);
-        await fetch(`https://${host}`, { method: 'HEAD', redirect: 'follow', signal: ctrl.signal });
+        await fetch(`https://${cleanHost}`, { method: 'HEAD', redirect: 'follow', signal: ctrl.signal });
         clearTimeout(tid);
         return res.json({ status: 'ok' });
       } catch (e) {
         try {
           const ctrl2 = new AbortController();
           const tid2 = setTimeout(() => ctrl2.abort(), 5000);
-          await fetch(`https://${host}`, { method: 'GET', redirect: 'follow', signal: ctrl2.signal });
+          await fetch(`https://${cleanHost}`, { method: 'GET', redirect: 'follow', signal: ctrl2.signal });
           clearTimeout(tid2);
           return res.json({ status: 'ok' });
         } catch (e2) {
