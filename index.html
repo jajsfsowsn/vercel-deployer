@@ -91,13 +91,35 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 </button>
 </div>
 
-<!-- STEP 3: Deploy -->
+<!-- STEP 3: Region Selection -->
 <div id="s3" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s3n" class="sn">۳</div>
-<div><h2 class="font-bold text-sm">دیپلوی خودکار</h2><p class="text-slate-400 text-[11px]">شروع دیپلوی پنل و TCP Proxy</p></div>
+<div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px]">منطقه سرور فیلترشکن</p></div>
 </div>
-<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
+<div class="grid grid-cols-2 gap-2 mb-3" id="regionGrid">
+<div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div class="text-2xl mb-1">🇳🇱</div>
+<p class="text-xs font-bold">آمستردام</p>
+<p class="text-[10px] text-slate-500">Holland</p>
+</div>
+<div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div class="text-2xl mb-1">🇸🇬</div>
+<p class="text-xs font-bold">سنگاپور</p>
+<p class="text-[10px] text-slate-500">Singapore</p>
+</div>
+<div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div class="text-2xl mb-1">🇺🇸</div>
+<p class="text-xs font-bold">ویرجینیا</p>
+<p class="text-[10px] text-slate-500">Virginia</p>
+</div>
+<div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div class="text-2xl mb-1">🇺🇸</div>
+<p class="text-xs font-bold">کالیفرنیا</p>
+<p class="text-[10px] text-slate-500">San Francisco</p>
+</div>
+</div>
+<button onclick="step4()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25" disabled>
 <i class="fas fa-rocket ml-1"></i>دیپلوی کن
 </button>
 </div>
@@ -129,6 +151,11 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <div class="info-card rounded-xl p-3">
 <span class="text-slate-400 text-xs block mb-1">🔐 نام کاربری و رمز</span>
 <p class="text-cyan-400 font-mono text-sm">admin / admin</p>
+</div>
+<!-- Region -->
+<div class="info-card rounded-xl p-3">
+<span class="text-slate-400 text-xs block mb-1">🌍 منطقه سرور</span>
+<p class="font-mono text-sm font-bold" id="regionInfo">-</p>
 </div>
 <!-- TCP Proxy -->
 <div class="info-card rounded-xl p-3">
@@ -232,8 +259,16 @@ document.getElementById('s3').classList.add('active');
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== STEP 3: Deploy ===== */
-async function step3(){
+/* ===== Region Picker ===== */
+function pickRegion(r,el){
+S.region=r;
+document.querySelectorAll('.region-card').forEach(c=>{c.classList.remove('border-cyan-500');c.classList.add('border-slate-700');c.style.background='';});
+el.classList.remove('border-slate-700');el.classList.add('border-cyan-500');el.style.background='rgba(14,165,233,0.1)';
+document.getElementById('b3').disabled=false;
+}
+
+/* ===== STEP 4: Deploy ===== */
+async function step4(){
 document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s4').classList.add('active');
 const steps=[
@@ -242,7 +277,7 @@ const steps=[
 ];
 for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600);}
 try{
-const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg});
+const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region||'sfo'});
 if(r.status==='error')throw new Error(r.error);
 if(r.status==='need_github_app'){
 document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';
@@ -252,6 +287,7 @@ if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="tex
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
 S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
 document.getElementById('pUrl').textContent=r.panelUrl;
+document.getElementById('regionInfo').textContent=r.regionName||'کالیفرنیا';
 document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');

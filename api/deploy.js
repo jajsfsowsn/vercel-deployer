@@ -10,8 +10,11 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-  const { githubToken, railwayToken } = req.body || {};
+  const { githubToken, railwayToken, region } = req.body || {};
   if (!githubToken || !railwayToken) return res.status(400).json({ error: 'Both tokens required' });
+
+  const REGIONS = { 'ams': 'آمستردام', 'sin': 'سنگاپور', 'sfo': 'کالیفرنیا', 'iad': 'ویرجینیا' };
+  const selectedRegion = REGIONS[region] ? region : 'sfo';
 
   const log = [];
   const step = (msg) => log.push(msg);
@@ -69,6 +72,12 @@ module.exports = async (req, res) => {
     if (!svcId) throw new Error('سرویس هنوز ساخته نشده.');
     step(`سرویس: ${svcId}`);
 
+    // Set region
+    step(`تنظیم منطقه: ${REGIONS[selectedRegion]}...`);
+    await rq(`mutation($sid: String!, $eid: String!, $i: ServiceInstanceUpdateInput!) { serviceInstanceUpdate(serviceId: $sid, environmentId: $eid, input: $i) }`, railwayToken, {
+      sid: svcId, eid: envId, i: { region: selectedRegion }
+    }).catch(()=>{});
+
     // Set env vars
     step('تنظیم NGINX_PORT=3000...');
     await rq(`mutation($i: VariableCollectionUpsertInput!) { variableCollectionUpsert(input: $i) }`, railwayToken, {
@@ -102,7 +111,8 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({
       status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
-      panelUrl, tcpDomain, tcpDomainId, log
+      panelUrl, tcpDomain, tcpDomainId, region: selectedRegion,
+      regionName: REGIONS[selectedRegion], log
     });
 
   } catch (err) {
