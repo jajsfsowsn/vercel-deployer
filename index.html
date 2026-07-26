@@ -9,8 +9,11 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap');
 *{font-family:'Vazirmatn',sans-serif;box-sizing:border-box}
-body{background:linear-gradient(135deg,#0a0a1a 0%,#1a1040 40%,#0d1a2d 100%);min-height:100vh;color:white}
-.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
+/* Dark theme (default) */
+body.dark{background:linear-gradient(135deg,#0a0a1a 0%,#1a1040 40%,#0d1a2d 100%);color:white}
+body.light{background:linear-gradient(135deg,#f0f4ff 0%,#e8eeff 40%,#f5f0ff 100%);color:#1a1a2e}
+.glass.dark{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
+.glass.light{background:rgba(255,255,255,0.7);backdrop-filter:blur(20px);border:1px solid rgba(0,0,0,0.08)}
 .step-box{opacity:0.3;pointer-events:none;transition:all 0.5s}
 .step-box.active{opacity:1;pointer-events:auto}
 .sn{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:white;flex-shrink:0}
@@ -21,15 +24,26 @@ body{background:linear-gradient(135deg,#0a0a1a 0%,#1a1040 40%,#0d1a2d 100%);min-
 .fade-in{animation:fadeUp 0.5s ease-out forwards}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .shimmer{background:linear-gradient(90deg,#0ea5e9 25%,#818cf8 50%,#0ea5e9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
-input[type="password"],input[type="text"]{transition:all 0.3s}
 input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
-.region-card{cursor:pointer;transition:all 0.3s}
-.region-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
-.region-card.selected{border-color:#0ea5e9 !important;background:rgba(14,165,233,0.1) !important;box-shadow:0 0 20px rgba(14,165,233,0.2)}
+body.dark input[type="password"],body.dark input[type="text"]{background:rgba(15,23,42,0.8);border-color:#334155;color:white}
+body.light input[type="password"],body.light input[type="text"]{background:rgba(255,255,255,0.9);border-color:#cbd5e1;color:#1a1a2e}
+body.dark .info-card{background:rgba(30,41,59,0.5)}
+body.light .info-card{background:rgba(241,245,249,0.8)}
+/* Theme toggle */
+.theme-toggle{position:fixed;top:16px;left:16px;z-index:50;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s;border:none;font-size:18px}
+body.dark .theme-toggle{background:rgba(255,255,255,0.1);color:#fbbf24;border:1px solid rgba(255,255,255,0.15)}
+body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px solid rgba(0,0,0,0.1)}
+.theme-toggle:hover{transform:scale(1.1)}
 </style>
 </head>
-<body class="flex items-center justify-center p-4">
-<div class="w-full max-w-md mx-auto">
+<body class="dark flex items-center justify-center p-4">
+
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="تغییر حالت شب/روز">
+  <i class="fas fa-moon" id="themeIcon"></i>
+</button>
+
+<div class="w-full max-w-md mx-auto pt-12">
 <!-- Header -->
 <div class="text-center mb-5 fade-in">
 <div class="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 px-4 py-1.5 rounded-full border border-cyan-500/20 mb-3">
@@ -39,7 +53,7 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 <p class="text-slate-500 text-xs">فقط توکن‌ها رو وارد کن، بقیه‌اش خودکاره</p>
 </div>
 
-<!-- ===== STEP 1: GitHub Token ===== -->
+<!-- STEP 1: GitHub Token -->
 <div id="s1" class="glass rounded-2xl p-5 mb-4 step-box active fade-in">
 <div class="flex items-center gap-3 mb-3">
 <div id="s1n" class="sn">۱</div>
@@ -51,14 +65,14 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 <span class="text-[10px] text-cyan-400 mr-auto">ساخت توکن <i class="fas fa-external-link-alt text-[8px]"></i></span>
 </a>
 <p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">repo</span> و <span class="text-cyan-400">admin:org</span> کافیه</p>
-<input id="ghToken" type="password" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="ghp_xxxxxxxxxxxx">
+<input id="ghToken" type="password" class="w-full px-3 py-2 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="ghp_xxxxxxxxxxxx">
 <div id="ghMsg" class="hidden mb-2 text-xs"></div>
 <button onclick="step1()" id="b1" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
 <i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
-<!-- ===== STEP 2: Railway Token ===== -->
+<!-- STEP 2: Railway Token -->
 <div id="s2" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s2n" class="sn">۲</div>
@@ -70,47 +84,25 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 <span class="text-[10px] text-cyan-400 mr-auto">ساخت توکن <i class="fas fa-external-link-alt text-[8px]"></i></span>
 </a>
 <p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">read/write</span> کافیه</p>
-<input id="rgToken" type="password" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="railway_xxxxxxxx">
+<input id="rgToken" type="password" class="w-full px-3 py-2 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="railway_xxxxxxxx">
 <div id="rgMsg" class="hidden mb-2 text-xs"></div>
 <button onclick="step2()" id="b2" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
 <i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
-<!-- ===== STEP 3: Region Selection ===== -->
+<!-- STEP 3: Deploy -->
 <div id="s3" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s3n" class="sn">۳</div>
-<div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px]">منطقه سرور فیلترشکن</p></div>
+<div><h2 class="font-bold text-sm">دیپلوی خودکار</h2><p class="text-slate-400 text-[11px]">شروع دیپلوی پنل و TCP Proxy</p></div>
 </div>
-<div class="grid grid-cols-2 gap-2 mb-3" id="regionGrid">
-<div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
-<div class="text-2xl mb-1">🇳🇱</div>
-<p class="text-xs font-bold">آمستردام</p>
-<p class="text-[10px] text-slate-500">Holland</p>
-</div>
-<div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
-<div class="text-2xl mb-1">🇸🇬</div>
-<p class="text-xs font-bold">سنگاپور</p>
-<p class="text-[10px] text-slate-500">Singapore</p>
-</div>
-<div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
-<div class="text-2xl mb-1">🇺🇸</div>
-<p class="text-xs font-bold">ویرجینیا</p>
-<p class="text-[10px] text-slate-500">Virginia</p>
-</div>
-<div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
-<div class="text-2xl mb-1">🇺🇸</div>
-<p class="text-xs font-bold">کالیفرنیا</p>
-<p class="text-[10px] text-slate-500">San Francisco</p>
-</div>
-</div>
-<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25" disabled>
+<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
 <i class="fas fa-rocket ml-1"></i>دیپلوی کن
 </button>
 </div>
 
-<!-- ===== STEP 4: Progress + Results ===== -->
+<!-- STEP 4: Progress + Results -->
 <div id="s4" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s4n" class="sn">۴</div>
@@ -123,33 +115,28 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 </div>
 </div>
 <div id="logbox" class="hidden text-xs space-y-1 mb-3 max-h-32 overflow-y-auto"></div>
-<!-- Results (hidden initially) -->
-<div id="s4Result" class="hidden">
+<!-- Results -->
+<div id="s4Result" class="hidden space-y-3">
 <!-- Panel URL -->
-<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
+<div class="info-card rounded-xl p-3">
 <div class="flex justify-between items-center mb-1">
 <span class="text-slate-400 text-xs">🔗 آدرس پنل</span>
 <button onclick="cp('pUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="text-white font-mono text-sm" id="pUrl">-</p>
+<p class="font-mono text-sm" id="pUrl">-</p>
 </div>
 <!-- Credentials -->
-<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
+<div class="info-card rounded-xl p-3">
 <span class="text-slate-400 text-xs block mb-1">🔐 نام کاربری و رمز</span>
 <p class="text-cyan-400 font-mono text-sm">admin / admin</p>
 </div>
-<!-- Region info -->
-<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
-<span class="text-slate-400 text-xs block mb-1">🌍 منطقه سرور</span>
-<p class="text-white text-sm font-bold" id="regionInfo">-</p>
-</div>
 <!-- TCP Proxy -->
-<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
+<div class="info-card rounded-xl p-3">
 <div class="flex justify-between items-center mb-2">
 <span class="text-slate-400 text-xs">🌐 TCP Proxy :8080</span>
 <button onclick="cp('tUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="text-white font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
+<p class="font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
 <div class="flex gap-2">
 <button onclick="testTcp()" id="tBtn" class="flex-1 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید
@@ -160,7 +147,7 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 </div>
 <p id="tStatus" class="text-[10px] text-center mt-1.5"></p>
 </div>
-<!-- Open Panel Button -->
+<!-- Open Panel -->
 <button onclick="window.open(document.getElementById('pUrl').textContent)" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm">
 <i class="fas fa-external-link-alt ml-1"></i>باز کردن پنل مدیریت
 </button>
@@ -168,7 +155,7 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 </div>
 
 <!-- Tutorial -->
-<div class="glass rounded-2xl p-4 fade-in">
+<div class="glass rounded-2xl p-4 fade-in mb-4">
 <div class="flex items-center gap-2 mb-3">
 <i class="fas fa-book-open text-cyan-400 text-sm"></i>
 <span class="font-bold text-sm">آموزش استفاده 📋</span>
@@ -188,9 +175,26 @@ input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
 
 <script>
 /* ===== State ===== */
-const S={gh:'',rg:'',region:'sfo',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
+const S={gh:'',rg:'',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
 const api=async(url,body)=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();};
 const sl=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ===== Theme Toggle ===== */
+function toggleTheme(){
+const b=document.body;
+const icon=document.getElementById('themeIcon');
+if(b.classList.contains('dark')){
+b.classList.remove('dark');b.classList.add('light');
+icon.className='fas fa-sun';
+localStorage.setItem('theme','light');
+}else{
+b.classList.remove('light');b.classList.add('dark');
+icon.className='fas fa-moon';
+localStorage.setItem('theme','dark');
+}
+}
+// Load saved theme
+(function(){const t=localStorage.getItem('theme');if(t==='light'){document.body.classList.remove('dark');document.body.classList.add('light');document.getElementById('themeIcon').className='fas fa-sun';}})();
 
 /* ===== STEP 1: GitHub ===== */
 async function step1(){
@@ -228,25 +232,17 @@ document.getElementById('s3').classList.add('active');
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== Region Picker ===== */
-function pickRegion(r,el){
-S.region=r;
-document.querySelectorAll('.region-card').forEach(c=>c.classList.remove('selected'));
-el.classList.add('selected');
-document.getElementById('b3').disabled=false;
-}
-
 /* ===== STEP 3: Deploy ===== */
 async function step3(){
 document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s4').classList.add('active');
 const steps=[
 {t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},
-{t:'دیپلوی کد...',p:60},{t:'تنظیم منطقه سرور...',p:75},{t:'ساخت دامنه...',p:90},{t:'تکمیل!',p:100}
+{t:'دیپلوی کد...',p:60},{t:'ساخت دامنه پنل...',p:75},{t:'ساخت TCP Proxy...',p:90},{t:'تکمیل!',p:100}
 ];
 for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600);}
 try{
-const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region});
+const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg});
 if(r.status==='error')throw new Error(r.error);
 if(r.status==='need_github_app'){
 document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';
@@ -257,7 +253,6 @@ S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
 S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
 document.getElementById('pUrl').textContent=r.panelUrl;
 document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
-document.getElementById('regionInfo').textContent=(r.regionName||'کالیفرنیا')+' ('+r.region+')';
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
