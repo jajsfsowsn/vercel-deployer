@@ -293,6 +293,9 @@ document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
 document.getElementById('logbox').classList.remove('hidden');
+
+// Auto-setup: create inbound + client
+step4AutoSetup(r.panelUrl);
 }catch(e){
 document.getElementById('ptxt').textContent='خطا: '+e.message;
 document.getElementById('pbar').style.background='#ef4444';
@@ -335,6 +338,24 @@ document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 tex
 }else throw new Error(r.error||'ناشناخته');
 }catch(e){document.getElementById('tStatus').textContent='❌ '+e.message;}
 document.getElementById('nBtn').innerHTML='<i class="fas fa-sync ml-1"></i>تغییر دامنه';
+}
+
+/* ===== Auto-setup: create inbound + client ===== */
+async function step4AutoSetup(panelUrl){
+try{
+const lb=document.getElementById('logbox');
+lb.innerHTML+='<p class="text-slate-400">⚙️ در حال راه‌اندازی پنل...</p>';
+const r=await api('/api/auto-setup',{panelUrl});
+if(r.status==='ok'){
+if(r.log)r.log.forEach(l=>{lb.innerHTML+='<p class="text-green-400">✓ '+l+'</p>';});
+lb.innerHTML+='<p class="text-green-400 font-bold">✅ پنل آماده استفاده!</p>';
+}else{
+lb.innerHTML+='<p class="text-amber-400">⚠️ راه‌اندازی خودکار: '+(r.error||'ناشناخته')+'</p>';
+lb.innerHTML+='<p class="text-slate-400 text-[10px]">میتونید دستی از پنل مدیریت Inbound بسازید.</p>';
+}
+}catch(e){
+document.getElementById('logbox').innerHTML+='<p class="text-slate-400">ℹ️ راه‌اندازی خودکار انجام نشد. دستی از پنل بسازید.</p>';
+}
 }
 
 /* ===== Helpers ===== */
