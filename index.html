@@ -9,7 +9,6 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap');
 *{font-family:'Vazirmatn',sans-serif;box-sizing:border-box}
-/* Dark theme (default) */
 body.dark{background:linear-gradient(135deg,#0a0a1a 0%,#1a1040 40%,#0d1a2d 100%);color:white}
 body.light{background:linear-gradient(135deg,#f0f4ff 0%,#e8eeff 40%,#f5f0ff 100%);color:#1a1a2e}
 .glass.dark{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
@@ -29,20 +28,15 @@ body.dark input[type="password"],body.dark input[type="text"]{background:rgba(15
 body.light input[type="password"],body.light input[type="text"]{background:rgba(255,255,255,0.9);border-color:#cbd5e1;color:#1a1a2e}
 body.dark .info-card{background:rgba(30,41,59,0.5)}
 body.light .info-card{background:rgba(241,245,249,0.8)}
-/* Theme toggle */
 .theme-toggle{position:fixed;top:16px;left:16px;z-index:50;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s;border:none;font-size:18px}
 body.dark .theme-toggle{background:rgba(255,255,255,0.1);color:#fbbf24;border:1px solid rgba(255,255,255,0.15)}
 body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px solid rgba(0,0,0,0.1)}
 .theme-toggle:hover{transform:scale(1.1)}
+.region-card.selected{border-color:#0ea5e9 !important;background:rgba(14,165,233,0.1) !important}
 </style>
 </head>
 <body class="dark flex items-center justify-center p-4">
-
-<!-- Theme Toggle Button -->
-<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="تغییر حالت شب/روز">
-  <i class="fas fa-moon" id="themeIcon"></i>
-</button>
-
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon" id="themeIcon"></i></button>
 <div class="w-full max-w-md mx-auto pt-12">
 <!-- Header -->
 <div class="text-center mb-5 fade-in">
@@ -53,7 +47,7 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <p class="text-slate-500 text-xs">فقط توکن‌ها رو وارد کن، بقیه‌اش خودکاره</p>
 </div>
 
-<!-- STEP 1: GitHub Token -->
+<!-- STEP 1: GitHub -->
 <div id="s1" class="glass rounded-2xl p-5 mb-4 step-box active fade-in">
 <div class="flex items-center gap-3 mb-3">
 <div id="s1n" class="sn">۱</div>
@@ -67,12 +61,12 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">repo</span> و <span class="text-cyan-400">admin:org</span> کافیه</p>
 <input id="ghToken" type="password" class="w-full px-3 py-2 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="ghp_xxxxxxxxxxxx">
 <div id="ghMsg" class="hidden mb-2 text-xs"></div>
-<button onclick="step1()" id="b1" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
+<button onclick="step1()" id="b1" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition-all">
 <i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
-<!-- STEP 2: Railway Token -->
+<!-- STEP 2: Railway -->
 <div id="s2" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s2n" class="sn">۲</div>
@@ -86,40 +80,32 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">read/write</span> کافیه</p>
 <input id="rgToken" type="password" class="w-full px-3 py-2 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="railway_xxxxxxxx">
 <div id="rgMsg" class="hidden mb-2 text-xs"></div>
-<button onclick="step2()" id="b2" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
+<button onclick="step2()" id="b2" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition-all">
 <i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
-<!-- STEP 3: Region Selection -->
+<!-- STEP 3: Region -->
 <div id="s3" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s3n" class="sn">۳</div>
 <div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px]">منطقه سرور فیلترشکن</p></div>
 </div>
-<div class="grid grid-cols-2 gap-2 mb-3" id="regionGrid">
+<div class="grid grid-cols-2 gap-2 mb-3">
 <div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
-<div class="text-2xl mb-1">🇳🇱</div>
-<p class="text-xs font-bold">آمستردام</p>
-<p class="text-[10px] text-slate-500">Holland</p>
+<div class="text-2xl mb-1">🇳🇱</div><p class="text-xs font-bold">آمستردام</p><p class="text-[10px] text-slate-500">Holland</p>
 </div>
 <div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
-<div class="text-2xl mb-1">🇸🇬</div>
-<p class="text-xs font-bold">سنگاپور</p>
-<p class="text-[10px] text-slate-500">Singapore</p>
+<div class="text-2xl mb-1">🇸🇬</div><p class="text-xs font-bold">سنگاپور</p><p class="text-[10px] text-slate-500">Singapore</p>
 </div>
 <div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
-<div class="text-2xl mb-1">🇺🇸</div>
-<p class="text-xs font-bold">ویرجینیا</p>
-<p class="text-[10px] text-slate-500">Virginia</p>
+<div class="text-2xl mb-1">🇺🇸</div><p class="text-xs font-bold">ویرجینیا</p><p class="text-[10px] text-slate-500">Virginia</p>
 </div>
 <div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
-<div class="text-2xl mb-1">🇺🇸</div>
-<p class="text-xs font-bold">کالیفرنیا</p>
-<p class="text-[10px] text-slate-500">San Francisco</p>
+<div class="text-2xl mb-1">🇺🇸</div><p class="text-xs font-bold">کالیفرنیا</p><p class="text-[10px] text-slate-500">San Francisco</p>
 </div>
 </div>
-<button onclick="step4()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25" disabled>
+<button onclick="step4()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition-all" disabled>
 <i class="fas fa-rocket ml-1"></i>دیپلوی کن
 </button>
 </div>
@@ -155,15 +141,28 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <!-- Region -->
 <div class="info-card rounded-xl p-3">
 <span class="text-slate-400 text-xs block mb-1">🌍 منطقه سرور</span>
-<p class="font-mono text-sm font-bold" id="regionInfo">-</p>
+<p class="text-sm font-bold" id="regionInfo">-</p>
 </div>
-<!-- TCP Proxy -->
+<!-- TCP Proxy Instructions -->
 <div class="info-card rounded-xl p-3">
 <div class="flex justify-between items-center mb-2">
 <span class="text-slate-400 text-xs">🌐 TCP Proxy :8080</span>
-<button onclick="cp('tUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
+<p class="text-[11px] text-slate-400 mb-2">برای ساخت TCP Proxy مراحل زیر رو انجام بدید:</p>
+<a id="tcpDashLink" href="#" target="_blank" class="block w-full py-2 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-xs font-bold text-indigo-400 text-center mb-2 hover:bg-indigo-600/30 transition-all">
+<i class="fas fa-external-link-alt ml-1"></i>رفتن به Settings پروژه
+</a>
+<p class="text-[10px] text-slate-500 mb-3">۱. روی <span class="text-white">+ TCP Proxy</span> کلیک کنید<br>۲. پورت <span class="text-white">8080</span> رو انتخاب کنید<br>۳. دامنه ساخته شده رو کپی کنید</p>
+<!-- Input for TCP domain -->
+<div id="tcpInputBox">
+<div class="flex gap-2 mb-2">
+<input id="tcpManualDomain" type="text" class="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none" placeholder="دامنه TCP Proxy رو اینجا بزنید">
+<button onclick="setTcpDomain()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-xs font-bold whitespace-nowrap">ثبت</button>
+</div>
+</div>
+<!-- TCP active section (after domain set) -->
+<div id="tcpActiveBox" class="hidden">
+<p class="font-mono text-sm mb-2" id="tUrl">-</p>
 <div class="flex gap-2">
 <button onclick="testTcp()" id="tBtn" class="flex-1 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید
@@ -174,6 +173,7 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 </div>
 <p id="tStatus" class="text-[10px] text-center mt-1.5"></p>
 </div>
+</div>
 <!-- Open Panel -->
 <button onclick="window.open(document.getElementById('pUrl').textContent)" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm">
 <i class="fas fa-external-link-alt ml-1"></i>باز کردن پنل مدیریت
@@ -181,59 +181,33 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 </div>
 </div>
 
-<!-- Tutorial -->
-<div class="glass rounded-2xl p-4 fade-in mb-4">
-<div class="flex items-center gap-2 mb-3">
-<i class="fas fa-book-open text-cyan-400 text-sm"></i>
-<span class="font-bold text-sm">آموزش استفاده 📋</span>
-</div>
-<div class="space-y-2 text-xs text-slate-400">
-<div class="flex gap-2 items-start">
-<span class="text-cyan-400 font-bold">۱.</span>
-<span>آدرس پنل مدیریت رو باز کنید. یوزرنیم و پسورد: <span class="text-cyan-400 font-bold">admin/admin</span></span>
-</div>
-<div class="flex gap-2 items-start">
-<span class="text-cyan-400 font-bold">۲.</span>
-<span>از بخش <span class="text-cyan-400 font-bold">Inbound Settings</span> یه کاربر جدید بسازید و لینک اشتراک رو کپی کنید.</span>
-</div>
-</div>
+<!-- Tribute -->
+<div class="text-center mt-6 mb-4 fade-in">
+<p class="text-slate-500 text-xs">ساخته شده توسط <span class="text-cyan-400 font-bold">مهرداد</span></p>
+<p class="text-slate-600 text-[10px] mt-1">به یاد <span class="text-cyan-400 font-bold">Armik</span> که همیشه وصلمون میکرد 🕊️ <span class="text-slate-500">(روحش شاد)</span></p>
 </div>
 </div>
 
 <script>
-/* ===== State ===== */
-const S={gh:'',rg:'',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
+const S={gh:'',rg:'',region:'sfo',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
 const api=async(url,body)=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();};
 const sl=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ===== Theme Toggle ===== */
 function toggleTheme(){
-const b=document.body;
-const icon=document.getElementById('themeIcon');
-if(b.classList.contains('dark')){
-b.classList.remove('dark');b.classList.add('light');
-icon.className='fas fa-sun';
-localStorage.setItem('theme','light');
-}else{
-b.classList.remove('light');b.classList.add('dark');
-icon.className='fas fa-moon';
-localStorage.setItem('theme','dark');
+const b=document.body;const icon=document.getElementById('themeIcon');
+if(b.classList.contains('dark')){b.classList.remove('dark');b.classList.add('light');icon.className='fas fa-sun';localStorage.setItem('theme','light');}
+else{b.classList.remove('light');b.classList.add('dark');icon.className='fas fa-moon';localStorage.setItem('theme','dark');}
 }
-}
-// Load saved theme
 (function(){const t=localStorage.getItem('theme');if(t==='light'){document.body.classList.remove('dark');document.body.classList.add('light');document.getElementById('themeIcon').className='fas fa-sun';}})();
 
-/* ===== STEP 1: GitHub ===== */
 async function step1(){
-const t=document.getElementById('ghToken').value.trim();
-if(!t)return;
+const t=document.getElementById('ghToken').value.trim();if(!t)return;
 const b=document.getElementById('b1');b.disabled=true;b.innerHTML='<i class="fas fa-spinner spin"></i> ...';
 const m=document.getElementById('ghMsg');m.classList.remove('hidden');
 try{
 m.innerHTML='<span class="text-slate-400">بررسی توکن...</span>';
 const v=await api('/api/connect',{action:'verify_github',githubToken:t});
-if(v.status==='error')throw new Error(v.error);
-S.gh=t;
+if(v.status==='error')throw new Error(v.error);S.gh=t;
 m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.user+' — متصل ✓</span>';
 document.getElementById('s1n').classList.add('done');document.getElementById('s1n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s2').classList.add('active');
@@ -241,17 +215,14 @@ document.getElementById('s2').classList.add('active');
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== STEP 2: Railway ===== */
 async function step2(){
-const t=document.getElementById('rgToken').value.trim();
-if(!t)return;
+const t=document.getElementById('rgToken').value.trim();if(!t)return;
 const b=document.getElementById('b2');b.disabled=true;b.innerHTML='<i class="fas fa-spinner spin"></i> ...';
 const m=document.getElementById('rgMsg');m.classList.remove('hidden');
 try{
 m.innerHTML='<span class="text-slate-400">بررسی توکن...</span>';
 const v=await api('/api/connect',{action:'verify_railway',railwayToken:t});
-if(v.status==='error')throw new Error(v.error);
-S.rg=t;
+if(v.status==='error')throw new Error(v.error);S.rg=t;
 m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.email+' — متصل ✓</span>';
 document.getElementById('s2n').classList.add('done');document.getElementById('s2n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s3').classList.add('active');
@@ -259,7 +230,6 @@ document.getElementById('s3').classList.add('active');
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== Region Picker ===== */
 function pickRegion(r,el){
 S.region=r;
 document.querySelectorAll('.region-card').forEach(c=>{c.classList.remove('border-cyan-500');c.classList.add('border-slate-700');c.style.background='';});
@@ -267,35 +237,27 @@ el.classList.remove('border-slate-700');el.classList.add('border-cyan-500');el.s
 document.getElementById('b3').disabled=false;
 }
 
-/* ===== STEP 4: Deploy ===== */
 async function step4(){
 document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s4').classList.add('active');
-const steps=[
-{t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},
-{t:'دیپلوی کد...',p:60},{t:'ساخت دامنه پنل...',p:75},{t:'ساخت TCP Proxy...',p:90},{t:'تکمیل!',p:100}
-];
+const steps=[{t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},{t:'دیپلوی کد...',p:60},{t:'ساخت دامنه...',p:80},{t:'تکمیل!',p:100}];
 for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600);}
 try{
-const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region||'sfo'});
+const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region});
 if(r.status==='error')throw new Error(r.error);
 if(r.status==='need_github_app'){
 document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';
-document.getElementById('logbox').classList.remove('hidden');return;
-}
+document.getElementById('logbox').classList.remove('hidden');return;}
 if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
 S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
 document.getElementById('pUrl').textContent=r.panelUrl;
 document.getElementById('regionInfo').textContent=r.regionName||'کالیفرنیا';
-document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
+document.getElementById('tcpDashLink').href='https://railway.com/project/'+r.projectId+'/'+r.serviceId;
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
 document.getElementById('logbox').classList.remove('hidden');
-
-// Auto-setup: create inbound + client
-step4AutoSetup(r.panelUrl);
 }catch(e){
 document.getElementById('ptxt').textContent='خطا: '+e.message;
 document.getElementById('pbar').style.background='#ef4444';
@@ -304,7 +266,14 @@ document.getElementById('logbox').classList.remove('hidden');
 }
 }
 
-/* ===== TCP Test ===== */
+function setTcpDomain(){
+const d=document.getElementById('tcpManualDomain').value.trim();if(!d)return;
+S.tcpDomain=d;
+document.getElementById('tUrl').textContent=d+':8080';
+document.getElementById('tcpInputBox').classList.add('hidden');
+document.getElementById('tcpActiveBox').classList.remove('hidden');
+}
+
 async function testTcp(){
 if(!S.tcpDomain)return;
 document.getElementById('tBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
@@ -313,52 +282,21 @@ document.getElementById('tStatus').textContent='در حال تست...';
 try{
 const r=await api('/api/tcp',{action:'test',host:S.tcpDomain,railwayToken:S.rg});
 const st=document.getElementById('tStatus');
-if(r.status==='ok'){
-st.textContent='✅ بدون فیلتر — فعال';st.className='text-[10px] text-center mt-1.5 text-green-400 font-bold';
-}else{
-st.textContent='❌ فیلتر شده';st.className='text-[10px] text-center mt-1.5 text-red-400 font-bold';
-}
+if(r.status==='ok'){st.textContent='✅ بدون فیلتر — فعال';st.className='text-[10px] text-center mt-1.5 text-green-400 font-bold';}
+else{st.textContent='❌ فیلتر شده';st.className='text-[10px] text-center mt-1.5 text-red-400 font-bold';}
 }catch(e){document.getElementById('tStatus').textContent='❌ خطا: '+e.message;}
 document.getElementById('tBtn').innerHTML='<i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید';
 }
 
-/* ===== TCP Change: delete old + create new ===== */
-async function changeTcp(){
-if(!confirm('دامنه فعلی حذف و جدید ساخته میشه. ادامه؟'))return;
-document.getElementById('nBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
+function changeTcp(){
+document.getElementById('tcpActiveBox').classList.add('hidden');
+document.getElementById('tcpInputBox').classList.remove('hidden');
+document.getElementById('tcpManualDomain').value='';
+document.getElementById('tcpManualDomain').focus();
+document.getElementById('tStatus').textContent='دامنه قبلی رو از Railway حذف کنید و جدید بسازید';
 document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
-document.getElementById('tStatus').textContent='حذف و ساخت دامنه جدید...';
-try{
-const r=await api('/api/tcp',{action:'change',domainId:S.tcpDomainId,serviceId:S.svcId,environmentId:S.envId,railwayToken:S.rg});
-if(r.status==='ok'&&r.domain){
-S.tcpDomain=r.domain;S.tcpDomainId=r.domainId;
-document.getElementById('tUrl').textContent=r.domain+':8080';
-document.getElementById('tStatus').textContent='⚠️ دامنه جدید ساخته شد — تست کنید';
-document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
-}else throw new Error(r.error||'ناشناخته');
-}catch(e){document.getElementById('tStatus').textContent='❌ '+e.message;}
-document.getElementById('nBtn').innerHTML='<i class="fas fa-sync ml-1"></i>تغییر دامنه';
 }
 
-/* ===== Auto-setup: create inbound + client ===== */
-async function step4AutoSetup(panelUrl){
-try{
-const lb=document.getElementById('logbox');
-lb.innerHTML+='<p class="text-slate-400">⚙️ در حال راه‌اندازی پنل...</p>';
-const r=await api('/api/auto-setup',{panelUrl});
-if(r.status==='ok'){
-if(r.log)r.log.forEach(l=>{lb.innerHTML+='<p class="text-green-400">✓ '+l+'</p>';});
-lb.innerHTML+='<p class="text-green-400 font-bold">✅ پنل آماده استفاده!</p>';
-}else{
-lb.innerHTML+='<p class="text-amber-400">⚠️ راه‌اندازی خودکار: '+(r.error||'ناشناخته')+'</p>';
-lb.innerHTML+='<p class="text-slate-400 text-[10px]">میتونید دستی از پنل مدیریت Inbound بسازید.</p>';
-}
-}catch(e){
-document.getElementById('logbox').innerHTML+='<p class="text-slate-400">ℹ️ راه‌اندازی خودکار انجام نشد. دستی از پنل بسازید.</p>';
-}
-}
-
-/* ===== Helpers ===== */
 function cp(id){navigator.clipboard?.writeText(document.getElementById(id).textContent);}
 </script>
 </body>
