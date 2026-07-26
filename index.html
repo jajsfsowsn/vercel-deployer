@@ -5,53 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MehrdadVPN - دیپلوی خودکار</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-body{font-family:'Vazirmatn',sans-serif}
-.bg-main{background:linear-gradient(135deg,#0c1220 0%,#1a0a2e 50%,#0d1f3c 100%);min-height:100vh}
-.glass{background:rgba(15,23,42,.8);backdrop-filter:blur(16px);border:1px solid rgba(59,130,246,.15)}
-.glow{box-shadow:0 0 40px rgba(59,130,246,.3)}
-.sn{width:40px;height:40px;min-width:40px;background:linear-gradient(135deg,#06b6d4,#3b82f6);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px}
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap');
+*{font-family:'Vazirmatn',sans-serif;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0a1a 0%,#1a1040 40%,#0d1a2d 100%);min-height:100vh;color:white}
+.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08)}
+.step-box{opacity:0.3;pointer-events:none;transition:all 0.5s}
+.step-box.active{opacity:1;pointer-events:auto}
+.sn{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:white;flex-shrink:0}
 .sn.done{background:linear-gradient(135deg,#10b981,#059669)}
-.spin{animation:sp 1s linear infinite}
-@keyframes sp{100%{transform:rotate(360deg)}}
-.pbar{height:4px;background:#1e293b;border-radius:4px;overflow:hidden}
-.pfill{height:100%;background:linear-gradient(90deg,#06b6d4,#3b82f6);border-radius:4px;transition:width .5s}
-.fade{animation:fi .4s ease}
-@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.step-box{display:none}
-.step-box.active{display:block}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp 0.5s ease-out forwards}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.shimmer{background:linear-gradient(90deg,#0ea5e9 25%,#818cf8 50%,#0ea5e9 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+input[type="password"],input[type="text"]{transition:all 0.3s}
+input:focus{box-shadow:0 0 0 2px rgba(14,165,233,0.3)}
+.region-card{cursor:pointer;transition:all 0.3s}
+.region-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+.region-card.selected{border-color:#0ea5e9 !important;background:rgba(14,165,233,0.1) !important;box-shadow:0 0 20px rgba(14,165,233,0.2)}
 </style>
 </head>
-<body class="bg-main text-white">
-<div class="container mx-auto px-4 py-8 max-w-lg">
-
+<body class="flex items-center justify-center p-4">
+<div class="w-full max-w-md mx-auto">
 <!-- Header -->
-<div class="text-center mb-8">
-<div class="w-20 h-20 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg glow">
-<i class="fas fa-shield-halved text-3xl text-white"></i>
+<div class="text-center mb-5 fade-in">
+<div class="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 px-4 py-1.5 rounded-full border border-cyan-500/20 mb-3">
+<span class="text-cyan-400 text-xs font-bold">MehrdadVPN</span>
 </div>
-<h1 class="text-3xl font-bold mb-1">MehrdadVPN</h1>
-<p class="text-slate-400 text-sm">دیپلوی خودکار پنل 3x-ui روی Railway</p>
+<h1 class="text-lg font-black mb-1">دیپلوی خودکار پنل VPN</h1>
+<p class="text-slate-500 text-xs">فقط توکن‌ها رو وارد کن، بقیه‌اش خودکاره</p>
 </div>
 
 <!-- ===== STEP 1: GitHub Token ===== -->
-<div id="s1" class="glass rounded-2xl p-5 mb-4 active">
+<div id="s1" class="glass rounded-2xl p-5 mb-4 step-box active fade-in">
 <div class="flex items-center gap-3 mb-3">
 <div id="s1n" class="sn">۱</div>
-<div><h2 class="font-bold">GitHub Token</h2><p class="text-slate-400 text-xs">برای فورک پروژه</p></div>
+<div><h2 class="font-bold text-sm">توکن گیتهاب</h2><p class="text-slate-400 text-[11px]">fork خودکار پروژه</p></div>
 </div>
-<a href="https://github.com/settings/tokens" target="_blank" class="flex items-center gap-2 bg-slate-800/50 rounded-xl p-2.5 mb-3 hover:bg-slate-800 text-xs">
-<i class="fab fa-github text-slate-300"></i>
-<span class="text-slate-400">github.com/settings/tokens</span>
-<span class="text-cyan-400 mr-auto">باز کن ↗</span>
+<a href="https://github.com/settings/tokens" target="_blank" class="flex items-center gap-2 bg-slate-800/50 rounded-xl p-2.5 mb-3 hover:bg-slate-800/80 transition-all">
+<i class="fab fa-github text-slate-400"></i>
+<span class="text-[11px] text-slate-300">github.com/settings/tokens</span>
+<span class="text-[10px] text-cyan-400 mr-auto">ساخت توکن <i class="fas fa-external-link-alt text-[8px]"></i></span>
 </a>
-<p class="text-[11px] text-slate-500 mb-2">تیک‌ها: <span class="text-green-400">repo</span> + <span class="text-green-400">workflow</span></p>
-<input id="ghToken" type="password" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:border-cyan-500 focus:outline-none mb-2" placeholder="ghp_...">
-<div id="ghMsg" class="hidden text-xs mb-2"></div>
-<button onclick="step1()" id="b1" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold text-sm transition-all">
-<i class="fas fa-check ml-1"></i>بررسی و فورک
+<p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">repo</span> و <span class="text-cyan-400">admin:org</span> کافیه</p>
+<input id="ghToken" type="password" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="ghp_xxxxxxxxxxxx">
+<div id="ghMsg" class="hidden mb-2 text-xs"></div>
+<button onclick="step1()" id="b1" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
+<i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
@@ -59,100 +62,94 @@ body{font-family:'Vazirmatn',sans-serif}
 <div id="s2" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s2n" class="sn">۲</div>
-<div><h2 class="font-bold">Railway Token</h2><p class="text-slate-400 text-xs">برای دیپلوی</p></div>
+<div><h2 class="font-bold text-sm">توکن Railway</h2><p class="text-slate-400 text-[11px]">اتصال به پلتفرم ابری</p></div>
 </div>
-<a href="https://railway.app/account/tokens" target="_blank" class="flex items-center gap-2 bg-slate-800/50 rounded-xl p-2.5 mb-3 hover:bg-slate-800 text-xs">
-<i class="fas fa-key text-cyan-400"></i>
-<span class="text-slate-400">railway.app/account/tokens</span>
-<span class="text-cyan-400 mr-auto">باز کن ↗</span>
+<a href="https://railway.app/account/tokens" target="_blank" class="flex items-center gap-2 bg-slate-800/50 rounded-xl p-2.5 mb-3 hover:bg-slate-800/80 transition-all">
+<i class="fas fa-key text-slate-400"></i>
+<span class="text-[11px] text-slate-300">railway.app/account/tokens</span>
+<span class="text-[10px] text-cyan-400 mr-auto">ساخت توکن <i class="fas fa-external-link-alt text-[8px]"></i></span>
 </a>
-<input id="rgToken" type="password" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:border-cyan-500 focus:outline-none mb-2" placeholder="rails_...">
-<div id="rgMsg" class="hidden text-xs mb-2"></div>
-<button onclick="step2()" id="b2" class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold text-sm transition-all">
-<i class="fas fa-check ml-1"></i>بررسی و اتصال
+<p class="text-[10px] text-slate-500 mb-2">فقط تیک <span class="text-cyan-400">read/write</span> کافیه</p>
+<input id="rgToken" type="password" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700 rounded-xl text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none mb-2" placeholder="railway_xxxxxxxx">
+<div id="rgMsg" class="hidden mb-2 text-xs"></div>
+<button onclick="step2()" id="b2" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25">
+<i class="fas fa-plug ml-1"></i>بررسی و اتصال
 </button>
 </div>
 
-<!-- Region Selector -->
-<div id="regionBox" class="glass rounded-2xl p-5 mb-4 step-box">
+<!-- ===== STEP 3: Region Selection ===== -->
+<div id="s3" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
-<div id="regionNum" class="sn">۳</div>
-<div><h2 class="font-bold">انتخاب سرور</h2><p class="text-slate-400 text-xs">منطقه سرور فیلترشکن</p></div>
+<div id="s3n" class="sn">۳</div>
+<div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px]">منطقه سرور فیلترشکن</p></div>
 </div>
-<div class="grid grid-cols-2 gap-2">
-<button onclick="pickRegion('us-west1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
-<i class="fas fa-flag-usa text-blue-400 text-lg mb-1"></i>
-<p class="text-xs font-bold">کالیفرنیا</p>
-<p class="text-[10px] text-slate-500">us-west1</p>
-</button>
-<button onclick="pickRegion('us-east4',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
-<i class="fas fa-landmark text-purple-400 text-lg mb-1"></i>
-<p class="text-xs font-bold">ویرجینیا</p>
-<p class="text-[10px] text-slate-500">us-east4</p>
-</button>
-<button onclick="pickRegion('europe-west1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
-<i class="fas fa-wind text-cyan-400 text-lg mb-1"></i>
+<div class="grid grid-cols-2 gap-2 mb-3" id="regionGrid">
+<div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
+<div class="text-2xl mb-1">🇳🇱</div>
 <p class="text-xs font-bold">آمستردام</p>
-<p class="text-[10px] text-slate-500">europe-west1</p>
-</button>
-<button onclick="pickRegion('asia-southeast1',this)" class="region-btn bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
-<i class="fas fa-palm-tree text-green-400 text-lg mb-1"></i>
-<p class="text-xs font-bold">سنگاپور</p>
-<p class="text-[10px] text-slate-500">asia-southeast1</p>
-</button>
+<p class="text-[10px] text-slate-500">Holland</p>
 </div>
-<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm mt-3 transition-all" disabled>
-<i class="fas fa-rocket ml-1"></i>انتخاب و دیپلوی
+<div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
+<div class="text-2xl mb-1">🇸🇬</div>
+<p class="text-xs font-bold">سنگاپور</p>
+<p class="text-[10px] text-slate-500">Singapore</p>
+</div>
+<div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
+<div class="text-2xl mb-1">🇺🇸</div>
+<p class="text-xs font-bold">ویرجینیا</p>
+<p class="text-[10px] text-slate-500">Virginia</p>
+</div>
+<div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center">
+<div class="text-2xl mb-1">🇺🇸</div>
+<p class="text-xs font-bold">کالیفرنیا</p>
+<p class="text-[10px] text-slate-500">San Francisco</p>
+</div>
+</div>
+<button onclick="step3()" id="b3" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-cyan-500/25" disabled>
+<i class="fas fa-rocket ml-1"></i>دیپلوی کن
 </button>
 </div>
 
-<!-- ===== STEP 4: Deploy Progress + Results ===== -->
+<!-- ===== STEP 4: Progress + Results ===== -->
 <div id="s4" class="glass rounded-2xl p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-3">
 <div id="s4n" class="sn">۴</div>
-<div><h2 class="font-bold" id="s4Title">دیپلوی...</h2><p class="text-slate-400 text-xs">همه چیز خودکار انجام میشه</p></div>
+<div><h2 id="s4Title" class="font-bold text-sm">دیپلوی در حال انجام...</h2><p class="text-slate-400 text-[11px]">همه چیز خودکار انجام میشه</p></div>
 </div>
 <div id="s4Progress">
-<div class="pbar mb-2"><div class="pfill" id="pbar" style="width:0%"></div></div>
-<p class="text-[11px] text-slate-400 text-center" id="ptxt">شروع...</p>
-<div id="logbox" class="mt-2 bg-slate-900/80 rounded-xl p-2.5 max-h-32 overflow-y-auto text-[10px] text-slate-500 font-mono space-y-0.5 hidden"></div>
+<p id="ptxt" class="text-xs text-slate-400 mb-2">در حال بررسی...</p>
+<div class="h-1.5 bg-slate-800 rounded-full overflow-hidden mb-2">
+<div id="pbar" class="h-full rounded-full shimmer transition-all duration-500" style="width:0%"></div>
 </div>
-<div id="s4Result" class="hidden space-y-2.5 fade">
+</div>
+<div id="logbox" class="hidden text-xs space-y-1 mb-3 max-h-32 overflow-y-auto"></div>
+<!-- Results (hidden initially) -->
+<div id="s4Result" class="hidden">
 <!-- Panel URL -->
-<div class="bg-slate-800/50 rounded-xl p-3">
+<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
 <div class="flex justify-between items-center mb-1">
-<span class="text-slate-400 text-xs">🔗 پنل مدیریت</span>
+<span class="text-slate-400 text-xs">🔗 آدرس پنل</span>
 <button onclick="cp('pUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="text-white font-mono text-sm break-all" id="pUrl">-</p>
+<p class="text-white font-mono text-sm" id="pUrl">-</p>
 </div>
 <!-- Credentials -->
-<div class="bg-slate-800/50 rounded-xl p-3 text-xs">
-<span class="text-slate-400">🔐 ورود: </span>
-<span class="text-white font-mono">admin</span>
-<span class="text-slate-400"> / </span>
-<span class="text-white font-mono">admin</span>
-<p class="text-amber-400 text-[10px] mt-1">⚠️ بلافاصله رمز رو عوض کنید</p>
+<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
+<span class="text-slate-400 text-xs block mb-1">🔐 نام کاربری و رمز</span>
+<p class="text-cyan-400 font-mono text-sm">admin / admin</p>
+</div>
+<!-- Region info -->
+<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
+<span class="text-slate-400 text-xs block mb-1">🌍 منطقه سرور</span>
+<p class="text-white text-sm font-bold" id="regionInfo">-</p>
 </div>
 <!-- TCP Proxy -->
-<div class="bg-slate-800/50 rounded-xl p-3">
+<div class="bg-slate-800/50 rounded-xl p-3 mb-3">
 <div class="flex justify-between items-center mb-2">
 <span class="text-slate-400 text-xs">🌐 TCP Proxy :8080</span>
+<button onclick="cp('tUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<p class="text-[11px] text-slate-400 mb-2">برای ساخت TCP Proxy از Railway Dashboard استفاده کنید:</p>
-<a id="tcpDashLink" href="#" target="_blank" class="block w-full py-2 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-xs font-bold text-indigo-400 text-center mb-2 hover:bg-indigo-600/30">
-<i class="fas fa-external-link-alt ml-1"></i>رفتن به Railway Dashboard
-</a>
-<p class="text-[10px] text-slate-500 mb-2">در بخش Networking → <span class="text-white">+ TCP Proxy</span> → پورت <span class="text-white">8080</span></p>
-<!-- After creating, enter domain for testing -->
-<div id="tcpInputBox" class="hidden">
-<div class="flex gap-2 mb-2">
-<input id="tcpManualDomain" type="text" class="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono focus:border-cyan-500 focus:outline-none" placeholder="دامنه TCP Proxy رو وارد کنید">
-<button onclick="setTcpDomain()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-xs font-bold">ثبت</button>
-</div>
-</div>
-<div id="tcpActiveBox" class="hidden">
-<p class="text-white font-mono text-sm mb-2" id="tUrl">-</p>
+<p class="text-white font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
 <div class="flex gap-2">
 <button onclick="testTcp()" id="tBtn" class="flex-1 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید
@@ -163,40 +160,39 @@ body{font-family:'Vazirmatn',sans-serif}
 </div>
 <p id="tStatus" class="text-[10px] text-center mt-1.5"></p>
 </div>
-<button onclick="showTcpInput()" class="w-full py-1.5 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-[11px] text-slate-400 mt-2 transition-all">
-<i class="fas fa-plus ml-1"></i>TCP Proxy ساختم، دامنه رو ثبت کنم
-</button>
-</div>
-<!-- Open Panel -->
+<!-- Open Panel Button -->
 <button onclick="window.open(document.getElementById('pUrl').textContent)" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm">
-<i class="fas fa-external-link-alt ml-1"></i>باز کردن پنل
+<i class="fas fa-external-link-alt ml-1"></i>باز کردن پنل مدیریت
 </button>
 </div>
 </div>
 
-<!-- FAQ -->
-<div class="glass rounded-2xl p-4 mb-4">
-<h2 class="font-bold text-sm mb-3"><i class="fas fa-question-circle text-cyan-400 ml-1"></i>سوالات</h2>
-<details class="bg-slate-900/50 rounded-xl mb-2 overflow-hidden">
-<summary class="p-2.5 cursor-pointer hover:bg-slate-800 text-xs font-bold">دامنه فیلتر شد؟</summary>
-<p class="p-2.5 pt-0 text-[11px] text-slate-400">دکمه «تغییر دامنه» رو بزنید تا TCP Proxy جدید با آدرس تازه ساخته بشه.</p>
-</details>
-<details class="bg-slate-900/50 rounded-xl overflow-hidden">
-<summary class="p-2.5 cursor-pointer hover:bg-slate-800 text-xs font-bold">رایگانه؟</summary>
-<p class="p-2.5 pt-0 text-[11px] text-slate-400">بله! Railway پلن رایگان داره (500 ساعت/ماه).</p>
-</details>
+<!-- Tutorial -->
+<div class="glass rounded-2xl p-4 fade-in">
+<div class="flex items-center gap-2 mb-3">
+<i class="fas fa-book-open text-cyan-400 text-sm"></i>
+<span class="font-bold text-sm">آموزش استفاده 📋</span>
 </div>
-
-<!-- Footer -->
-<div class="text-center text-slate-600 text-xs pb-6">
-<p>ساخته شده با ❤️ توسط <a href="https://t.me/saweg78" class="text-cyan-400">مهرداد</a></p>
+<div class="space-y-2 text-xs text-slate-400">
+<div class="flex gap-2 items-start">
+<span class="text-cyan-400 font-bold">۱.</span>
+<span>آدرس پنل مدیریت رو باز کنید. یوزرنیم و پسورد: <span class="text-cyan-400 font-bold">admin/admin</span></span>
+</div>
+<div class="flex gap-2 items-start">
+<span class="text-cyan-400 font-bold">۲.</span>
+<span>از بخش <span class="text-cyan-400 font-bold">Inbound Settings</span> یه کاربر جدید بسازید و لینک اشتراک رو کپی کنید.</span>
+</div>
+</div>
 </div>
 </div>
 
 <script>
-let S={gh:null,rg:null,user:null,fork:null,projId:null,svcId:null,envId:null,tcpDomain:null};
+/* ===== State ===== */
+const S={gh:'',rg:'',region:'sfo',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
+const api=async(url,body)=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();};
+const sl=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ===== STEP 1: GitHub Token + Fork ===== */
+/* ===== STEP 1: GitHub ===== */
 async function step1(){
 const t=document.getElementById('ghToken').value.trim();
 if(!t)return;
@@ -206,20 +202,15 @@ try{
 m.innerHTML='<span class="text-slate-400">بررسی توکن...</span>';
 const v=await api('/api/connect',{action:'verify_github',githubToken:t});
 if(v.status==='error')throw new Error(v.error);
-S.gh=t;S.user=v.username;
-m.innerHTML='<span class="text-slate-400">فورک ریپو...</span>';
-const f=await api('/api/connect',{action:'fork_and_connect',githubToken:t});
-if(f.status==='error')throw new Error(f.error);
-S.fork=f.forkName;
-m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.username+' — فورک شد ✓</span>';
+S.gh=t;
+m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.user+' — متصل ✓</span>';
 document.getElementById('s1n').classList.add('done');document.getElementById('s1n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s2').classList.add('active');
 }catch(e){m.innerHTML='<i class="fas fa-times-circle text-red-400"></i> <span class="text-red-400">'+e.message+'</span>';}
-b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و فورک';
+b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
-/* ===== STEP 2: Railway Token ===== */
-let selectedRegion=null;
+/* ===== STEP 2: Railway ===== */
 async function step2(){
 const t=document.getElementById('rgToken').value.trim();
 if(!t)return;
@@ -232,72 +223,51 @@ if(v.status==='error')throw new Error(v.error);
 S.rg=t;
 m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.email+' — متصل ✓</span>';
 document.getElementById('s2n').classList.add('done');document.getElementById('s2n').innerHTML='<i class="fas fa-check"></i>';
-// Show region selector
-document.getElementById('regionBox').classList.add('active');
+document.getElementById('s3').classList.add('active');
 }catch(e){m.innerHTML='<i class="fas fa-times-circle text-red-400"></i> <span class="text-red-400">'+e.message+'</span>';}
 b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1"></i>بررسی و اتصال';
 }
 
 /* ===== Region Picker ===== */
 function pickRegion(r,el){
-selectedRegion=r;
-document.querySelectorAll('.region-btn').forEach(b=>{b.classList.remove('border-cyan-500');b.classList.add('border-slate-700');});
-el.classList.remove('border-slate-700');el.classList.add('border-cyan-500');
+S.region=r;
+document.querySelectorAll('.region-card').forEach(c=>c.classList.remove('selected'));
+el.classList.add('selected');
 document.getElementById('b3').disabled=false;
 }
 
 /* ===== STEP 3: Deploy ===== */
 async function step3(){
-document.getElementById('regionNum').classList.add('done');document.getElementById('regionNum').innerHTML='<i class="fas fa-check"></i>';
+document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
 document.getElementById('s4').classList.add('active');
-await doDeploy();
-}
-
-/* ===== STEP 4: Deploy ===== */
-async function doDeploy(){
-document.getElementById('logbox').classList.remove('hidden');
 const steps=[
-{t:'ساخت پروژه...',p:15},{t:'اتصال ریپو...',p:30},{t:'تنظیم متغیرها...',p:45},
-{t:'ساخت دامنه (3000)...',p:60},{t:'ساخت TCP Proxy (8080)...',p:75},{t:'راه‌اندازی...',p:90},{t:'تمام!',p:100}
+{t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},
+{t:'دیپلوی کد...',p:60},{t:'تنظیم منطقه سرور...',p:75},{t:'ساخت دامنه...',p:90},{t:'تکمیل!',p:100}
 ];
 for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600);}
 try{
-const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:selectedRegion||'us-west1'});
+const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region});
 if(r.status==='error')throw new Error(r.error);
 if(r.status==='need_github_app'){
 document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';
-document.getElementById('ptxt').textContent='نیاز به نصب GitHub App';
-return;
+document.getElementById('logbox').classList.remove('hidden');return;
 }
 if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
+S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
 document.getElementById('pUrl').textContent=r.panelUrl;
-// TCP Proxy section
-document.getElementById('tcpDashLink').href=r.tcpDashboardUrl||'#';
+document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
+document.getElementById('regionInfo').textContent=(r.regionName||'کالیفرنیا')+' ('+r.region+')';
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
-document.getElementById('s4n').classList.add('done');document.getElementById('s4n').innerHTML='<i class="fas fa-check"></i>';
+document.getElementById('logbox').classList.remove('hidden');
 }catch(e){
+document.getElementById('ptxt').textContent='خطا: '+e.message;
+document.getElementById('pbar').style.background='#ef4444';
 document.getElementById('logbox').innerHTML='<p class="text-red-400">❌ '+e.message+'</p>';
-document.getElementById('ptxt').textContent='خطا';
+document.getElementById('logbox').classList.remove('hidden');
 }
-}
-
-/* ===== TCP Show Input ===== */
-function showTcpInput(){
-document.getElementById('tcpInputBox').classList.remove('hidden');
-document.getElementById('tcpManualDomain').focus();
-}
-
-/* ===== TCP Set Domain ===== */
-function setTcpDomain(){
-const d=document.getElementById('tcpManualDomain').value.trim();
-if(!d)return;
-S.tcpDomain=d;
-document.getElementById('tUrl').textContent=d+':8080';
-document.getElementById('tcpInputBox').classList.add('hidden');
-document.getElementById('tcpActiveBox').classList.remove('hidden');
 }
 
 /* ===== TCP Test ===== */
@@ -318,21 +288,26 @@ st.textContent='❌ فیلتر شده';st.className='text-[10px] text-center mt-
 document.getElementById('tBtn').innerHTML='<i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید';
 }
 
-/* ===== TCP Change ===== */
+/* ===== TCP Change: delete old + create new ===== */
 async function changeTcp(){
-// Go back to input box
-document.getElementById('tcpActiveBox').classList.add('hidden');
-document.getElementById('tcpInputBox').classList.remove('hidden');
-document.getElementById('tcpManualDomain').value='';
-document.getElementById('tcpManualDomain').focus();
-document.getElementById('tStatus').textContent='دامنه قبلی رو از Railway Dashboard حذف کنید و جدید بسازید';
+if(!confirm('دامنه فعلی حذف و جدید ساخته میشه. ادامه؟'))return;
+document.getElementById('nBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
 document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
+document.getElementById('tStatus').textContent='حذف و ساخت دامنه جدید...';
+try{
+const r=await api('/api/tcp',{action:'change',domainId:S.tcpDomainId,serviceId:S.svcId,environmentId:S.envId,railwayToken:S.rg});
+if(r.status==='ok'&&r.domain){
+S.tcpDomain=r.domain;S.tcpDomainId=r.domainId;
+document.getElementById('tUrl').textContent=r.domain+':8080';
+document.getElementById('tStatus').textContent='⚠️ دامنه جدید ساخته شد — تست کنید';
+document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
+}else throw new Error(r.error||'ناشناخته');
+}catch(e){document.getElementById('tStatus').textContent='❌ '+e.message;}
+document.getElementById('nBtn').innerHTML='<i class="fas fa-sync ml-1"></i>تغییر دامنه';
 }
 
 /* ===== Helpers ===== */
-async function api(p,b){const r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return r.json();}
-function cp(id){navigator.clipboard.writeText(document.getElementById(id).textContent);alert('کپی شد! ✓');}
-function sl(ms){return new Promise(r=>setTimeout(r,ms));}
+function cp(id){navigator.clipboard?.writeText(document.getElementById(id).textContent);}
 </script>
 </body>
 </html>
