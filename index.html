@@ -214,10 +214,22 @@ body.light .rs.active{background:rgba(99,102,241,0.08);border-color:rgba(99,102,
 <button onclick="step2()" id="b2" class="btn-primary"><i class="fas fa-plug ml-1.5"></i>بررسی و اتصال</button>
 </div>
 
-<!-- STEP 3: Region -->
+<!-- STEP 3: Install GitHub App -->
 <div id="s3" class="lg p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-4">
 <div id="s3n" class="sn">۳</div>
+<div><h2 class="font-bold text-sm">اتصال GitHub به Railway</h2><p class="text-slate-400 text-[11px] mt-0.5">نصب GitHub App الزامیه</p></div>
+</div>
+<p class="text-[11px] text-slate-400 mb-3 leading-5">برای دیپلوی از گیتهاب، باید GitHub App روی اکانت Railway نصب باشه:</p>
+<a id="ghAppLink" href="https://github.com/apps/railway-app/installations/new" target="_blank" class="btn-glass text-center mb-3 flex items-center justify-center gap-2"><i class="fab fa-github text-sm"></i>نصب GitHub App</a>
+<p class="text-[10px] text-slate-500 mb-3">۱. روی دکمه بالا کلیک کنید<br>۲. دکمه <span class="font-bold">Install</span> رو بزنید<br>۳. ریپوی فورک شده رو انتخاب کنید<br>۴. بعد از نصب، دکمه پایین رو بزنید</p>
+<button onclick="step3()" id="b3" class="btn-primary"><i class="fas fa-check ml-1.5"></i>نصب کردم، ادامه بده</button>
+</div>
+
+<!-- STEP 4: Region -->
+<div id="s4" class="lg p-5 mb-4 step-box">
+<div class="flex items-center gap-3 mb-4">
+<div id="s4n" class="sn">۴</div>
 <div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px] mt-0.5">منطقه سرور فیلترشکن</p></div>
 </div>
 <div class="grid grid-cols-2 gap-2.5 mb-4">
@@ -226,21 +238,21 @@ body.light .rs.active{background:rgba(99,102,241,0.08);border-color:rgba(99,102,
 <div onclick="pickRegion('iad',this)" class="rc"><div class="text-2xl mb-1.5">🇺🇸</div><p class="text-xs font-bold">ویرجینیا</p><p class="text-[10px] text-slate-500">Virginia</p></div>
 <div onclick="pickRegion('sfo',this)" class="rc"><div class="text-2xl mb-1.5">🇺🇸</div><p class="text-xs font-bold">کالیفرنیا</p><p class="text-[10px] text-slate-500">San Francisco</p></div>
 </div>
-<button onclick="step4()" id="b3" class="btn-primary" disabled><i class="fas fa-rocket ml-1.5"></i>دیپلوی کن</button>
+<button onclick="step5()" id="b4" class="btn-primary" disabled><i class="fas fa-rocket ml-1.5"></i>دیپلوی کن</button>
 </div>
 
-<!-- STEP 4: Results -->
-<div id="s4" class="lg p-5 mb-4 step-box">
+<!-- STEP 5: Progress + Results -->
+<div id="s5" class="lg p-5 mb-4 step-box">
 <div class="flex items-center gap-3 mb-4">
-<div id="s4n" class="sn">۴</div>
-<div><h2 id="s4Title" class="font-bold text-sm">دیپلوی در حال انجام...</h2><p class="text-slate-400 text-[11px] mt-0.5">همه چیز خودکار انجام میشه</p></div>
+<div id="s5n" class="sn">۵</div>
+<div><h2 id="s5Title" class="font-bold text-sm">دیپلوی در حال انجام...</h2><p class="text-slate-400 text-[11px] mt-0.5">همه چیز خودکار انجام میشه</p></div>
 </div>
-<div id="s4Progress">
+<div id="s5Progress">
 <p id="ptxt" class="text-xs text-slate-400 mb-2.5">در حال بررسی...</p>
 <div class="h-1 bg-slate-800/50 rounded-full overflow-hidden mb-2"><div id="pbar" class="h-full shimmer transition-all duration-500" style="width:0%"></div></div>
 </div>
 <div id="logbox" class="hidden text-xs space-y-1 mb-4 max-h-32 overflow-y-auto"></div>
-<div id="s4Result" class="hidden space-y-3">
+<div id="s5Result" class="hidden space-y-3">
 <!-- Panel -->
 <div class="ic"><div class="flex justify-between items-center mb-1"><span class="text-slate-400 text-xs">🔗 آدرس پنل</span><button onclick="cp('pUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button></div><p class="font-mono text-sm" id="pUrl">-</p></div>
 <!-- Auth -->
@@ -299,9 +311,17 @@ async function step1(){const t=document.getElementById('ghToken').value.trim();i
 
 async function step2(){const t=document.getElementById('rgToken').value.trim();if(!t)return;const b=document.getElementById('b2');b.disabled=true;b.innerHTML='<i class="fas fa-spinner spin"></i> ...';const m=document.getElementById('rgMsg');m.classList.remove('hidden');try{m.innerHTML='<span class="text-slate-400">بررسی توکن...</span>';const v=await api('/api/connect',{action:'verify_railway',railwayToken:t});if(v.status==='error')throw new Error(v.error);S.rg=t;m.innerHTML='<i class="fas fa-check-circle text-green-400"></i> <span class="text-green-400">'+v.email+' — متصل ✓</span>';document.getElementById('s2n').classList.add('done');document.getElementById('s2n').innerHTML='<i class="fas fa-check"></i>';document.getElementById('s3').classList.add('active')}catch(e){m.innerHTML='<i class="fas fa-times-circle text-red-400"></i> <span class="text-red-400">'+e.message+'</span>'}b.disabled=false;b.innerHTML='<i class="fas fa-check ml-1.5"></i>بررسی و اتصال'}
 
-function pickRegion(r,el){S.region=r;document.querySelectorAll('.rc').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');document.getElementById('b3').disabled=false}
+/* ===== STEP 3: GitHub App ===== */
+async function step3(){
+document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';
+document.getElementById('s4').classList.add('active');
+}
 
-async function step4(){document.getElementById('s3n').classList.add('done');document.getElementById('s3n').innerHTML='<i class="fas fa-check"></i>';document.getElementById('s4').classList.add('active');const steps=[{t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},{t:'دیپلوی کد...',p:60},{t:'ساخت دامنه...',p:80},{t:'تکمیل!',p:100}];for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600)}try{const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region});if(r.status==='error')throw new Error(r.error);if(r.status==='need_github_app'){document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';document.getElementById('logbox').classList.remove('hidden');return}if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;document.getElementById('pUrl').textContent=r.panelUrl;document.getElementById('regionInfo').textContent=r.flag+' '+r.regionName;document.getElementById('tcpDashLink').href='https://railway.com/project/'+r.projectId;document.querySelectorAll('.rs').forEach(b=>b.classList.remove('active'));const cb=document.getElementById('rg-'+r.region);if(cb)cb.classList.add('active');document.getElementById('s4Progress').classList.add('hidden');document.getElementById('s4Result').classList.remove('hidden');document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';document.getElementById('logbox').classList.remove('hidden')}catch(e){document.getElementById('ptxt').textContent='خطا: '+e.message;document.getElementById('pbar').style.background='#ef4444';document.getElementById('logbox').innerHTML='<p class="text-red-400">❌ '+e.message+'</p>';document.getElementById('logbox').classList.remove('hidden')}}
+/* ===== STEP 4: Region ===== */
+function pickRegion(r,el){S.region=r;document.querySelectorAll('.rc').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');document.getElementById('b4').disabled=false}
+
+/* ===== STEP 5: Deploy ===== */
+async function step5(){document.getElementById('s4n').classList.add('done');document.getElementById('s4n').innerHTML='<i class="fas fa-check"></i>';document.getElementById('s5').classList.add('active');const steps=[{t:'فورک پروژه...',p:15},{t:'اتصال GitHub به Railway...',p:30},{t:'ساخت پروژه...',p:45},{t:'دیپلوی کد...',p:60},{t:'ساخت دامنه...',p:80},{t:'تکمیل!',p:100}];for(const s of steps){document.getElementById('ptxt').textContent=s.t;document.getElementById('pbar').style.width=s.p+'%';await sl(600)}try{const r=await api('/api/deploy',{githubToken:S.gh,railwayToken:S.rg,region:S.region});if(r.status==='error')throw new Error(r.error);if(r.status==='need_github_app'){document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+r.error+'</p><p><a href="'+r.installUrl+'" target="_blank" class="text-cyan-400 underline font-bold">👉 نصب GitHub App</a></p>';document.getElementById('logbox').classList.remove('hidden');return}if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;document.getElementById('pUrl').textContent=r.panelUrl;document.getElementById('regionInfo').textContent=r.flag+' '+r.regionName;document.getElementById('tcpDashLink').href='https://railway.com/project/'+r.projectId;document.querySelectorAll('.rs').forEach(b=>b.classList.remove('active'));const cb=document.getElementById('rg-'+r.region);if(cb)cb.classList.add('active');document.getElementById('s5Progress').classList.add('hidden');document.getElementById('s5Result').classList.remove('hidden');document.getElementById('s5Title').textContent='دیپلوی موفق! 🎉';document.getElementById('logbox').classList.remove('hidden')}catch(e){document.getElementById('ptxt').textContent='خطا: '+e.message;document.getElementById('pbar').style.background='#ef4444';document.getElementById('logbox').innerHTML='<p class="text-red-400">❌ '+e.message+'</p>';document.getElementById('logbox').classList.remove('hidden')}}
 
 async function changeRegion(r,el){if(!S.svcId||!S.envId)return;const st=document.getElementById('regionStatus');st.textContent='در حال تغییر...';st.className='text-[10px] text-center mt-2 text-amber-400';document.querySelectorAll('.rs').forEach(b=>b.classList.remove('active'));el.classList.add('active');try{const res=await api('/api/change-region',{railwayToken:S.rg,serviceId:S.svcId,environmentId:S.envId,region:r});if(res.status==='ok'){S.region=r;document.getElementById('regionInfo').textContent=res.flag+' '+res.regionName;st.textContent='✅ سرور تغییر کرد: '+res.flag+' '+res.regionName;st.className='text-[10px] text-center mt-2 text-green-400 font-bold'}else throw new Error(res.error||'ناشناخته')}catch(e){st.textContent='❌ '+e.message;st.className='text-[10px] text-center mt-2 text-red-400'}}
 
