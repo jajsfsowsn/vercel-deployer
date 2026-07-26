@@ -1,5 +1,6 @@
-// api/tcp.js — TCP Proxy: test + change (delete old, create new)
+// api/tcp.js — TCP Proxy: ping domain only (strip port)
 const RAILWAY_GQL = 'https://backboard.railway.app/graphql/v2';
+const net = require('net');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -14,49 +15,21 @@ module.exports = async (req, res) => {
   try {
     if (action === 'test') {
       if (!host) return res.status(400).json({ error: 'host required' });
-      // Strip port from host - test domain only
-      const cleanHost = host.split(':')[0];
+      // Strip port: "domain:12345" → "domain"
+      const cleanHost = host.split(':')[0].trim();
+      // Simple TCP ping on port 80
       try {
-        const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), 5000);
-        await fetch(`https://${cleanHost}`, { method: 'HEAD', redirect: 'follow', signal: ctrl.signal });
-        clearTimeout(tid);
-        return res.json({ status: 'ok' });
+        await tcpPing(cleanHost, 80, 5000);
+        return res.json({ status: 'ok', host: cleanHost });
       } catch (e) {
+        // Try port 443
         try {
-          const ctrl2 = new AbortController();
-          const tid2 = setTimeout(() => ctrl2.abort(), 5000);
-          await fetch(`https://${cleanHost}`, { method: 'GET', redirect: 'follow', signal: ctrl2.signal });
-          clearTimeout(tid2);
-          return res.json({ status: 'ok' });
+          await tcpPing(cleanHost, 443, 5000);
+          return res.json({ status: 'ok', host: cleanHost });
         } catch (e2) {
-          return res.json({ status: 'filtered' });
+          return res.json({ status: 'filtered', host: cleanHost });
         }
       }
-    }
-
-    if (action === 'change') {
-      if (!domainId || !serviceId || !environmentId) {
-        return res.status(400).json({ error: 'domainId, serviceId, environmentId required' });
-      }
-
-      // Delete old TCP proxy domain
-      try {
-        await rq(`mutation($id: String!) { serviceDomainDelete(id: $id) }`, railwayToken, { id: domainId });
-      } catch (e) { /* continue */ }
-
-      await sleep(2000);
-
-      // Create new one on port 8080
-      const createRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-        i: { serviceId, environmentId, targetPort: 8080 }
-      });
-
-      return res.json({
-        status: 'ok',
-        domain: createRes.data.serviceDomainCreate.domain,
-        domainId: createRes.data.serviceDomainCreate.id
-      });
     }
 
     return res.status(400).json({ error: 'Unknown action' });
@@ -65,11 +38,22 @@ module.exports = async (req, res) => {
   }
 };
 
-async function rq(query, token, variables = {}) {
-  const r = await fetch(RAILWAY_GQL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ query, variables }) });
-  const data = await r.json();
-  if (data.errors) throw new Error(`Railway: ${data.errors[0].message}`);
-  return data;
+function tcpPing(host, port, timeout) {
+  return new Promise((resolve, reject) => {
+    const socket = new net.Socket();
+    const timer = setTimeout(() => {
+      socket.destroy();
+      reject(new Error('timeout'));
+    }, timeout);
+    socket.connect(port, host, () => {
+      clearTimeout(timer);
+      socket.destroy();
+      resolve();
+    });
+    socket.on('error', (err) => {
+      clearTimeout(timer);
+      socket.destroy();
+      reject(err);
+    });
+  });
 }
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
