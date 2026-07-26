@@ -124,33 +124,18 @@ body{font-family:'Vazirmatn',sans-serif}
 <div class="bg-slate-800/50 rounded-xl p-3">
 <div class="flex justify-between items-center mb-2">
 <span class="text-slate-400 text-xs">🌐 TCP Proxy :8080</span>
+<button onclick="cp('tUrl')" class="text-cyan-400 text-[10px]"><i class="fas fa-copy ml-0.5"></i>کپی</button>
 </div>
-<div id="tcpSection">
-<p class="text-[11px] text-slate-400 mb-2">TCP Proxy از API ساخته نمیشه. باید از Railway Dashboard بسازید:</p>
-<a id="tcpDashLink" href="#" target="_blank" class="block w-full py-2 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-xs font-bold text-indigo-400 text-center mb-2 hover:bg-indigo-600/30">
-<i class="fas fa-external-link-alt ml-1"></i>رفتن به Railway Dashboard
-</a>
-<p class="text-[10px] text-slate-500 mb-2">در بخش Networking → روی <span class="text-white">+ TCP Proxy</span> بزنید و پورت <span class="text-white">8080</span> رو انتخاب کنید.</p>
-</div>
-<!-- After TCP proxy is created, user enters domain here -->
-<div id="tcpTestSection" class="hidden">
-<div class="flex gap-2 mb-2">
-<input id="tcpManualDomain" type="text" class="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono focus:border-cyan-500 focus:outline-none" placeholder="دامنه TCP Proxy">
-<button onclick="setTcpDomain()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-xs font-bold">ثبت</button>
-</div>
-</div>
-<div id="tcpActiveSection" class="hidden">
-<p class="text-white font-mono text-sm mb-2" id="tUrl">-</p>
+<p class="text-white font-mono text-sm mb-2" id="tUrl">در حال ساخت...</p>
 <div class="flex gap-2">
 <button onclick="testTcp()" id="tBtn" class="flex-1 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید
 </button>
-<button onclick="newTcp()" id="nBtn" class="flex-1 py-2 bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/30 rounded-lg text-xs font-bold transition-all hidden">
+<button onclick="changeTcp()" id="nBtn" class="flex-1 py-2 bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/30 rounded-lg text-xs font-bold transition-all">
 <i class="fas fa-sync ml-1"></i>تغییر دامنه
 </button>
 </div>
 <p id="tStatus" class="text-[10px] text-center mt-1.5"></p>
-</div>
 </div>
 <!-- Open Panel -->
 <button onclick="window.open(document.getElementById('pUrl').textContent)" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm">
@@ -260,12 +245,8 @@ return;
 if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
 document.getElementById('pUrl').textContent=r.panelUrl;
-S.tcpDomain=r.tcpDomain;
-// Show Railway dashboard link for TCP Proxy
-if(r.tcpDashboardUrl){
-document.getElementById('tcpDashLink').href=r.tcpDashboardUrl;
-document.getElementById('tcpTestSection').classList.remove('hidden');
-}
+S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
+document.getElementById('tUrl').textContent=r.tcpDomain?r.tcpDomain+':8080':'در حال ساخت...';
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
@@ -276,17 +257,6 @@ document.getElementById('ptxt').textContent='خطا';
 }
 }
 
-/* ===== TCP Set Domain ===== */
-function setTcpDomain(){
-const d=document.getElementById('tcpManualDomain').value.trim();
-if(!d)return;
-S.tcpDomain=d;
-document.getElementById('tUrl').textContent=d+':8080';
-document.getElementById('tcpSection').classList.add('hidden');
-document.getElementById('tcpTestSection').classList.add('hidden');
-document.getElementById('tcpActiveSection').classList.remove('hidden');
-}
-
 /* ===== TCP Test ===== */
 async function testTcp(){
 if(!S.tcpDomain)return;
@@ -294,31 +264,33 @@ document.getElementById('tBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
 document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-slate-400';
 document.getElementById('tStatus').textContent='در حال تست...';
 try{
-const r=await api('/api/tcp',{action:'test',host:S.tcpDomain,port:'8080',railwayToken:S.rg});
+const r=await api('/api/tcp',{action:'test',host:S.tcpDomain,railwayToken:S.rg});
 const st=document.getElementById('tStatus');
-const nb=document.getElementById('nBtn');
 if(r.status==='ok'){
 st.textContent='✅ بدون فیلتر — فعال';st.className='text-[10px] text-center mt-1.5 text-green-400 font-bold';
-nb.classList.add('hidden');
 }else{
 st.textContent='❌ فیلتر شده';st.className='text-[10px] text-center mt-1.5 text-red-400 font-bold';
-nb.classList.remove('hidden');
 }
-}catch(e){
-document.getElementById('tStatus').textContent='❌ خطا: '+e.message;
-document.getElementById('nBtn').classList.remove('hidden');
-}
+}catch(e){document.getElementById('tStatus').textContent='❌ خطا: '+e.message;}
 document.getElementById('tBtn').innerHTML='<i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید';
 }
 
-/* ===== TCP New ===== */
-async function newTcp(){
-if(!confirm('برای تغییر دامنه:\n۱. به Railway Dashboard بروید\n۲. TCP Proxy قبلی رو حذف کنید\n۳. یکی جدید بسازید (پورت 8080)\n۴. دامنه جدید رو اینجا وارد کنید\n\nادامه میدید؟'))return;
-// Show manual domain input again
-document.getElementById('tcpActiveSection').classList.add('hidden');
-document.getElementById('tcpTestSection').classList.remove('hidden');
-document.getElementById('tcpManualDomain').value='';
-document.getElementById('tcpManualDomain').focus();
+/* ===== TCP Change ===== */
+async function changeTcp(){
+if(!confirm('دامنه فعلی حذف و جدید ساخته میشه. ادامه؟'))return;
+document.getElementById('nBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
+document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
+document.getElementById('tStatus').textContent='حذف و ساخت دامنه جدید...';
+try{
+const r=await api('/api/tcp',{action:'change',domainId:S.tcpDomainId,serviceId:S.svcId,environmentId:S.envId,railwayToken:S.rg});
+if(r.status==='ok'&&r.domain){
+S.tcpDomain=r.domain;S.tcpDomainId=r.domainId;
+document.getElementById('tUrl').textContent=r.domain+':8080';
+document.getElementById('tStatus').textContent='⚠️ دامنه جدید ساخته شد — تست کنید';
+document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
+}else throw new Error(r.error||'ناشناخته');
+}catch(e){document.getElementById('tStatus').textContent='❌ '+e.message;}
+document.getElementById('nBtn').innerHTML='<i class="fas fa-sync ml-1"></i>تغییر دامنه';
 }
 
 /* ===== Helpers ===== */

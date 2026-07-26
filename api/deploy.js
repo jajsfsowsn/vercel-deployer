@@ -18,12 +18,10 @@ module.exports = async (req, res) => {
     const step = (msg) => log.push(msg);
 
     try {
-        // Get GitHub user
-        step('بررسی اکانت گیتهاب...');
+        step('بررسی گیتهاب...');
         const ghUser = await ghFetch('/user', githubToken);
         const ghUsern = ghUser.login;
 
-        // Fork if needed
         step('فورک پروژه...');
         try { await ghFetch(`/repos/${ghUsern}/3x-ui-Upgrade`, githubToken); }
         catch (e) {
@@ -33,23 +31,16 @@ module.exports = async (req, res) => {
         step(`فورک: ${ghUsern}/3x-ui-Upgrade`);
 
         // Check GitHub App
-        step('بررسی اتصال GitHub...');
         let repos;
-        try {
-            repos = await rq(`query { githubRepos { id } }`, railwayToken);
-        } catch (e) { repos = null; }
-
+        try { repos = await rq(`query { githubRepos { id } }`, railwayToken); } catch (e) { repos = null; }
         if (!repos?.data?.githubRepos?.length) {
             return res.status(200).json({
-                status: 'need_github_app',
-                error: 'GitHub App Railway نصب نیست. لینک زیر رو باز کنید:',
-                installUrl: 'https://github.com/apps/railway-app/installations/new',
-                log
+                status: 'need_github_app', error: 'GitHub App Railway نصب نیست:',
+                installUrl: 'https://github.com/apps/railway-app/installations/new', log
             });
         }
 
-        // Get workspace
-        step('دریافت اطلاعات Railway...');
+        // Workspace
         const wsData = await rq(`query { me { workspaces { id } } }`, railwayToken);
         const ws = wsData.data.me.workspaces || [];
         const wsId = ws.length > 0 ? ws[0].id : null;
@@ -69,10 +60,7 @@ module.exports = async (req, res) => {
         const depRes = await rq(`mutation($i: GitHubRepoDeployInput!) { githubRepoDeploy(input: $i) }`, railwayToken, {
             i: { projectId: projId, repo: `${ghUsern}/3x-ui-Upgrade`, branch: 'main', environmentId: envId }
         });
-        const deployId = depRes.data.githubRepoDeploy;
-        step(`دیپلوی: ${deployId}`);
-
-        // Wait for service creation
+        step(`دیپلوی: ${depRes.data.githubRepoDeploy}`);
         await sleep(8000);
 
         // Get service
@@ -80,54 +68,42 @@ module.exports = async (req, res) => {
         const svcData = await rq(`query($id: String!) { project(id: $id) { services { edges { node { id } } } } }`, railwayToken, { id: projId });
         const svcs = svcData.data.project?.services?.edges || [];
         const svcId = svcs[0]?.node?.id;
-        if (!svcId) throw new Error('سرویس هنوز ساخته نشده. لطفاً 30 ثانیه صبر کنید.');
+        if (!svcId) throw new Error('سرویس هنوز ساخته نشده.');
         step(`سرویس: ${svcId}`);
 
         // Set env vars
-        step('تنظیم متغیرها...');
+        step('تنظیم NGINX_PORT=3000...');
         await rq(`mutation($i: VariableCollectionUpsertInput!) { variableCollectionUpsert(input: $i) }`, railwayToken, {
             i: { projectId: projId, environmentId: envId, serviceId: svcId, variables: [{ name: 'NGINX_PORT', value: '3000' }] }
         }).catch(() => {});
-        step('NGINX_PORT=3000');
 
-        // Wait for deploy
         await sleep(5000);
 
-        // Trigger redeploy
+        // Redeploy
         step('ری‌استارت...');
         await rq(`mutation($eid: String!, $sid: String!) { serviceInstanceDeploy(environmentId: $eid, serviceId: $sid) { id } }`, railwayToken, { eid: envId, sid: svcId }).catch(() => {});
 
-        // Create ONLY ONE domain on port 3000 (panel)
+        // Domain on port 3000 (panel)
         step('ساخت دامنه پنل (3000)...');
-        let panelDomain;
-        try {
-            const dRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-                i: { serviceId: svcId, environmentId: envId, targetPort: 3000 }
-            });
-            panelDomain = dRes.data.serviceDomainCreate.domain;
-        } catch (e) {
-            const dRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-                i: { serviceId: svcId, environmentId: envId }
-            });
-            panelDomain = dRes.data.serviceDomainCreate.domain;
-        }
+        const dRes3000 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
+            i: { serviceId: svcId, environmentId: envId, targetPort: 3000 }
+        });
+        const panelDomain = dRes3000.data.serviceDomainCreate.domain;
         const panelUrl = `https://${panelDomain}/managepanel/`;
         step(`پنل: ${panelUrl}`);
 
-        // TCP Proxy on port 8080 — user must create manually in Railway dashboard
-        step('TCP Proxy: ساخت دستی از Railway Dashboard');
-        const tcpDashboardUrl = `https://railway.com/project/${projId}/${svcId}`;
+        // TCP Proxy domain on port 8080
+        step('ساخت TCP Proxy (8080)...');
+        const dRes8080 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
+            i: { serviceId: svcId, environmentId: envId, targetPort: 8080 }
+        });
+        const tcpDomain = dRes8080.data.serviceDomainCreate.domain;
+        const tcpDomainId = dRes8080.data.serviceDomainCreate.id;
+        step(`TCP Proxy: ${tcpDomain}:8080`);
 
         return res.status(200).json({
-            status: 'ok',
-            projectId: projId,
-            serviceId: svcId,
-            environmentId: envId,
-            panelUrl,
-            tcpProxy: null,
-            tcpDomain: null,
-            tcpDashboardUrl,
-            log
+            status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
+            panelUrl, tcpDomain, tcpDomainId, log
         });
 
     } catch (err) {
