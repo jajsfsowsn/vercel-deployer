@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
         if (action === 'check_github_app') {
             if (!railwayToken) return res.status(400).json({ error: 'Token required' });
             try {
-                const repos = await rq(`query { githubRepos { id nameWithOwner } }`, railwayToken);
+                const repos = await rq(`query { githubRepos { id fullName } }`, railwayToken);
                 const installed = repos.data?.githubRepos?.length > 0;
                 return res.json({ status: 'ok', installed, installUrl: 'https://github.com/apps/railway-app/installations/new' });
             } catch (e) {
