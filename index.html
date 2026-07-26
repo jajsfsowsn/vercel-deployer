@@ -32,11 +32,16 @@ body.light .info-card{background:rgba(241,245,249,0.8)}
 body.dark .theme-toggle{background:rgba(255,255,255,0.1);color:#fbbf24;border:1px solid rgba(255,255,255,0.15)}
 body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px solid rgba(0,0,0,0.1)}
 .theme-toggle:hover{transform:scale(1.1)}
-.region-card.selected{border-color:#0ea5e9 !important;background:rgba(14,165,233,0.1) !important}
+.region-card{cursor:pointer;transition:all 0.3s}
+.region-card:hover{transform:translateY(-2px)}
+.region-card.selected{border-color:#0ea5e9 !important;background:rgba(14,165,233,0.1) !important;box-shadow:0 0 20px rgba(14,165,233,0.2)}
+.region-sm{cursor:pointer;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1)}
+.region-sm:hover{border-color:rgba(14,165,233,0.5)}
+.region-sm.active{border-color:#0ea5e9;background:rgba(14,165,233,0.1)}
 </style>
 </head>
 <body class="dark flex items-center justify-center p-4">
-<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon" id="themeIcon"></i></button>
+<button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon" id="themeIcon"></i></button>
 <div class="w-full max-w-md mx-auto pt-12">
 <!-- Header -->
 <div class="text-center mb-5 fade-in">
@@ -92,16 +97,16 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <div><h2 class="font-bold text-sm">انتخاب سرور</h2><p class="text-slate-400 text-[11px]">منطقه سرور فیلترشکن</p></div>
 </div>
 <div class="grid grid-cols-2 gap-2 mb-3">
-<div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div onclick="pickRegion('ams',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
 <div class="text-2xl mb-1">🇳🇱</div><p class="text-xs font-bold">آمستردام</p><p class="text-[10px] text-slate-500">Holland</p>
 </div>
-<div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div onclick="pickRegion('sin',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
 <div class="text-2xl mb-1">🇸🇬</div><p class="text-xs font-bold">سنگاپور</p><p class="text-[10px] text-slate-500">Singapore</p>
 </div>
-<div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div onclick="pickRegion('iad',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
 <div class="text-2xl mb-1">🇺🇸</div><p class="text-xs font-bold">ویرجینیا</p><p class="text-[10px] text-slate-500">Virginia</p>
 </div>
-<div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center cursor-pointer hover:border-cyan-500/50 transition-all">
+<div onclick="pickRegion('sfo',this)" class="region-card bg-slate-800/50 border border-slate-700 rounded-xl p-3 text-center hover:border-cyan-500/50 transition-all">
 <div class="text-2xl mb-1">🇺🇸</div><p class="text-xs font-bold">کالیفرنیا</p><p class="text-[10px] text-slate-500">San Francisco</p>
 </div>
 </div>
@@ -140,8 +145,18 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 </div>
 <!-- Region -->
 <div class="info-card rounded-xl p-3">
-<span class="text-slate-400 text-xs block mb-1">🌍 منطقه سرور</span>
+<div class="flex justify-between items-center mb-2">
+<span class="text-slate-400 text-xs">🌍 منطقه سرور فعلی</span>
 <p class="text-sm font-bold" id="regionInfo">-</p>
+</div>
+<p class="text-[10px] text-slate-500 mb-2">تغییر سرور (بعد از دیپلوی اعمال میشه):</p>
+<div class="grid grid-cols-4 gap-1.5">
+<button onclick="changeRegion('sfo',this)" class="region-sm rounded-lg p-2 text-center text-[10px] font-bold" id="rg-sfo">🇺🇸<br>کالیفرنیا</button>
+<button onclick="changeRegion('iad',this)" class="region-sm rounded-lg p-2 text-center text-[10px] font-bold" id="rg-iad">🇺🇸<br>ویرجینیا</button>
+<button onclick="changeRegion('ams',this)" class="region-sm rounded-lg p-2 text-center text-[10px] font-bold" id="rg-ams">🇳🇱<br>آمستردام</button>
+<button onclick="changeRegion('sin',this)" class="region-sm rounded-lg p-2 text-center text-[10px] font-bold" id="rg-sin">🇸🇬<br>سنگاپور</button>
+</div>
+<p id="regionStatus" class="text-[10px] text-center mt-1.5"></p>
 </div>
 <!-- TCP Proxy Instructions -->
 <div class="info-card rounded-xl p-3">
@@ -153,14 +168,12 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 <i class="fas fa-external-link-alt ml-1"></i>رفتن به Settings پروژه
 </a>
 <p class="text-[10px] text-slate-500 mb-3">۱. روی <span class="text-white">+ TCP Proxy</span> کلیک کنید<br>۲. پورت <span class="text-white">8080</span> رو انتخاب کنید<br>۳. دامنه ساخته شده رو کپی کنید</p>
-<!-- Input for TCP domain -->
 <div id="tcpInputBox">
 <div class="flex gap-2 mb-2">
 <input id="tcpManualDomain" type="text" class="flex-1 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono ltr text-left focus:border-cyan-500 focus:outline-none" placeholder="دامنه TCP Proxy رو اینجا بزنید">
 <button onclick="setTcpDomain()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-xs font-bold whitespace-nowrap">ثبت</button>
 </div>
 </div>
-<!-- TCP active section (after domain set) -->
 <div id="tcpActiveBox" class="hidden">
 <p class="font-mono text-sm mb-2" id="tUrl">-</p>
 <div class="flex gap-2">
@@ -183,13 +196,13 @@ body.light .theme-toggle{background:rgba(0,0,0,0.05);color:#6366f1;border:1px so
 
 <!-- Tribute -->
 <div class="text-center mt-6 mb-4 fade-in">
-<p class="text-slate-500 text-xs">ساخته شده توسط <span class="text-cyan-400 font-bold">مهرداد</span></p>
+<p class="text-slate-500 text-xs">ساخته شده توسط <span class="text-cyan-400 font-bold">مهرداد</span> <a href="https://t.me/saweg78" target="_blank" class="text-blue-400 text-[10px]">@saweg78</a></p>
 <p class="text-slate-600 text-[10px] mt-1">به یاد <span class="text-cyan-400 font-bold">Armik</span> که همیشه وصلمون میکرد 🕊️ <span class="text-slate-500">(روحش شاد)</span></p>
 </div>
 </div>
 
 <script>
-const S={gh:'',rg:'',region:'sfo',projId:'',svcId:'',envId:'',tcpDomain:'',tcpDomainId:''};
+const S={gh:'',rg:'',region:'sfo',projId:'',svcId:'',envId:'',tcpDomain:''};
 const api=async(url,body)=>{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();};
 const sl=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -250,10 +263,13 @@ document.getElementById('logbox').innerHTML='<p class="text-amber-400">⚠️ '+
 document.getElementById('logbox').classList.remove('hidden');return;}
 if(r.log)document.getElementById('logbox').innerHTML=r.log.map(l=>'<p class="text-green-400">✓ '+l+'</p>').join('');
 S.projId=r.projectId;S.svcId=r.serviceId;S.envId=r.environmentId;
-S.tcpDomain=r.tcpDomain;S.tcpDomainId=r.tcpDomainId;
 document.getElementById('pUrl').textContent=r.panelUrl;
-document.getElementById('regionInfo').textContent=r.regionName||'کالیفرنیا';
+document.getElementById('regionInfo').textContent=r.flag+' '+r.regionName;
 document.getElementById('tcpDashLink').href='https://railway.com/project/'+r.projectId+'/'+r.serviceId;
+// Highlight current region button
+document.querySelectorAll('.region-sm').forEach(b=>b.classList.remove('active'));
+const curBtn=document.getElementById('rg-'+r.region);
+if(curBtn)curBtn.classList.add('active');
 document.getElementById('s4Progress').classList.add('hidden');
 document.getElementById('s4Result').classList.remove('hidden');
 document.getElementById('s4Title').textContent='دیپلوی موفق! 🎉';
@@ -266,6 +282,24 @@ document.getElementById('logbox').classList.remove('hidden');
 }
 }
 
+/* ===== Change Region after deploy ===== */
+async function changeRegion(r,el){
+if(!S.svcId||!S.envId)return;
+const st=document.getElementById('regionStatus');
+st.textContent='در حال تغییر...';st.className='text-[10px] text-center mt-1.5 text-amber-400';
+document.querySelectorAll('.region-sm').forEach(b=>b.classList.remove('active'));
+el.classList.add('active');
+try{
+const res=await api('/api/change-region',{railwayToken:S.rg,serviceId:S.svcId,environmentId:S.envId,region:r});
+if(res.status==='ok'){
+S.region=r;
+document.getElementById('regionInfo').textContent=res.flag+' '+res.regionName;
+st.textContent='✅ سرور تغییر کرد: '+res.flag+' '+res.regionName;st.className='text-[10px] text-center mt-1.5 text-green-400 font-bold';
+}else throw new Error(res.error||'ناشناخته');
+}catch(e){st.textContent='❌ '+e.message;st.className='text-[10px] text-center mt-1.5 text-red-400';}
+}
+
+/* ===== TCP ===== */
 function setTcpDomain(){
 const d=document.getElementById('tcpManualDomain').value.trim();if(!d)return;
 S.tcpDomain=d;
@@ -273,7 +307,6 @@ document.getElementById('tUrl').textContent=d+':8080';
 document.getElementById('tcpInputBox').classList.add('hidden');
 document.getElementById('tcpActiveBox').classList.remove('hidden');
 }
-
 async function testTcp(){
 if(!S.tcpDomain)return;
 document.getElementById('tBtn').innerHTML='<i class="fas fa-spinner spin"></i>';
@@ -287,16 +320,12 @@ else{st.textContent='❌ فیلتر شده';st.className='text-[10px] text-cente
 }catch(e){document.getElementById('tStatus').textContent='❌ خطا: '+e.message;}
 document.getElementById('tBtn').innerHTML='<i class="fas fa-signal ml-1"></i>بدون فیلترشکن تست کنید';
 }
-
 function changeTcp(){
 document.getElementById('tcpActiveBox').classList.add('hidden');
 document.getElementById('tcpInputBox').classList.remove('hidden');
 document.getElementById('tcpManualDomain').value='';
 document.getElementById('tcpManualDomain').focus();
-document.getElementById('tStatus').textContent='دامنه قبلی رو از Railway حذف کنید و جدید بسازید';
-document.getElementById('tStatus').className='text-[10px] text-center mt-1.5 text-amber-400';
 }
-
 function cp(id){navigator.clipboard?.writeText(document.getElementById(id).textContent);}
 </script>
 </body>

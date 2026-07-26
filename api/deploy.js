@@ -3,6 +3,13 @@ const SOURCE_REPO = 'jajsfsowsn/3x-ui-Upgrade';
 const RAILWAY_GQL = 'https://backboard.railway.app/graphql/v2';
 const GITHUB_API = 'https://api.github.com';
 
+const REGIONS = {
+  'ams': { name: 'آمستردام', flag: '🇳🇱' },
+  'sin': { name: 'سنگاپور', flag: '🇸🇬' },
+  'sfo': { name: 'کالیفرنیا', flag: '🇺🇸' },
+  'iad': { name: 'ویرجینیا', flag: '🇺🇸' },
+};
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -13,9 +20,7 @@ module.exports = async (req, res) => {
   const { githubToken, railwayToken, region } = req.body || {};
   if (!githubToken || !railwayToken) return res.status(400).json({ error: 'Both tokens required' });
 
-  const REGIONS = { 'ams': 'آمستردام', 'sin': 'سنگاپور', 'sfo': 'کالیفرنیا', 'iad': 'ویرجینیا' };
   const selectedRegion = REGIONS[region] ? region : 'sfo';
-
   const log = [];
   const step = (msg) => log.push(msg);
 
@@ -72,12 +77,6 @@ module.exports = async (req, res) => {
     if (!svcId) throw new Error('سرویس هنوز ساخته نشده.');
     step(`سرویس: ${svcId}`);
 
-    // Set region
-    step(`تنظیم منطقه: ${REGIONS[selectedRegion]}...`);
-    await rq(`mutation($sid: String!, $eid: String!, $i: ServiceInstanceUpdateInput!) { serviceInstanceUpdate(serviceId: $sid, environmentId: $eid, input: $i) }`, railwayToken, {
-      sid: svcId, eid: envId, i: { region: selectedRegion }
-    }).catch(()=>{});
-
     // Set env vars
     step('تنظیم NGINX_PORT=3000...');
     await rq(`mutation($i: VariableCollectionUpsertInput!) { variableCollectionUpsert(input: $i) }`, railwayToken, {
@@ -91,28 +90,19 @@ module.exports = async (req, res) => {
     await rq(`mutation($eid: String!, $sid: String!) { serviceInstanceDeploy(environmentId: $eid, serviceId: $sid) }`, railwayToken, { eid: envId, sid: svcId }).catch(() => {});
     await sleep(5000);
 
-    // Domain on port 3000 (panel)
+    // ONLY ONE domain on port 3000 (panel)
     step('ساخت دامنه پنل (3000)...');
-    const dRes3000 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
+    const dRes = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
       i: { serviceId: svcId, environmentId: envId, targetPort: 3000 }
     });
-    const panelDomain = dRes3000.data.serviceDomainCreate.domain;
+    const panelDomain = dRes.data.serviceDomainCreate.domain;
     const panelUrl = `https://${panelDomain}/managepanel/`;
     step(`پنل: ${panelUrl}`);
 
-    // TCP Proxy on port 8080
-    step('ساخت TCP Proxy (8080)...');
-    const dRes8080 = await rq(`mutation($i: ServiceDomainCreateInput!) { serviceDomainCreate(input: $i) { id domain } }`, railwayToken, {
-      i: { serviceId: svcId, environmentId: envId, targetPort: 8080 }
-    });
-    const tcpDomain = dRes8080.data.serviceDomainCreate.domain;
-    const tcpDomainId = dRes8080.data.serviceDomainCreate.id;
-    step(`TCP Proxy: ${tcpDomain}:8080`);
-
     return res.status(200).json({
       status: 'ok', projectId: projId, serviceId: svcId, environmentId: envId,
-      panelUrl, tcpDomain, tcpDomainId, region: selectedRegion,
-      regionName: REGIONS[selectedRegion], log
+      panelUrl, region: selectedRegion,
+      regionName: REGIONS[selectedRegion].name, log
     });
 
   } catch (err) {
